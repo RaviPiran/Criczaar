@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --red:       #dc2626;
+  --red-dark:  #991b1b;
+  --red-light: #fca5a5;
+  --blue:      #1d4ed8;
+  --blue-dark: #1e3a8a;
+  --blue-light:#93c5fd;
+  --navy:      #0f172a;
+  --surface:   #f8fafc;
+}
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: #f1f5f9;
+    color: #1a202c;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #e2e8f0; }
+  ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 4px; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-slate-200 rounded-2xl shadow-sm;
+  }
+  .card-hero {
+    @apply bg-white border-2 border-red-500 rounded-2xl shadow-md;
+  }
+  .btn {
+    @apply font-raj font-bold tracking-widest rounded-lg border-none cursor-pointer transition-all duration-200 flex items-center gap-1.5 justify-center;
+  }
+  .btn-primary {
+    @apply btn bg-gradient-to-br from-red-600 to-red-700 text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-400/40 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-gold {
+    @apply btn bg-gradient-to-br from-red-600 to-red-700 text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-400/40 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply btn bg-transparent border border-slate-300 text-slate-600 hover:border-red-500 hover:text-red-600;
+  }
+  .btn-red {
+    @apply btn bg-red-600 text-white hover:bg-red-700 hover:-translate-y-0.5 disabled:opacity-50;
+  }
+  .btn-green {
+    @apply btn bg-emerald-500 text-white hover:bg-emerald-600 hover:-translate-y-0.5;
+  }
+  .btn-blue {
+    @apply btn bg-blue-700 text-white hover:bg-blue-800 hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply btn bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 hover:text-slate-800;
+  }
+  .input {
+    @apply w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-3.5 py-2.5 font-raj text-base transition-colors focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 focus:bg-white placeholder-slate-400;
+  }
+  .label {
+    @apply text-xs text-slate-500 uppercase tracking-widest mb-1.5 block font-raj font-semibold;
+  }
+  .badge-batsman   { @apply bg-blue-100 text-blue-700 border border-blue-300 text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-bowler    { @apply bg-red-100  text-red-700  border border-red-300  text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-allrounder{ @apply bg-indigo-100 text-indigo-700 border border-indigo-300 text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-keeper    { @apply bg-cyan-100 text-cyan-700  border border-cyan-300  text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-sold      { @apply bg-emerald-100 text-emerald-700 border border-emerald-300 text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-unsold    { @apply bg-red-100  text-red-700  border border-red-300  text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-retained  { @apply bg-blue-100 text-blue-700 border border-blue-300 text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .badge-remaining { @apply bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-0.5 rounded-full font-bold; }
+  .section-title {
+    @apply font-orbitron text-xs text-red-600 tracking-widest uppercase px-4 py-3 border-b border-slate-200 bg-slate-50;
+  }
+  .stat-box {
+    @apply bg-slate-50 border border-slate-200 rounded-xl p-3 text-center;
+  }
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-red-50 transition-all duration-200 cursor-pointer font-raj font-semibold tracking-wide text-sm;
+  }
+  .nav-item-active {
+    @apply bg-red-50 text-red-700 border-l-2 border-red-600;
+  }
+}
+
+@keyframes confettiFall {
+  from { transform: translateY(-100px) rotate(0deg); opacity:1; }
+  to   { transform: translateY(110vh)  rotate(720deg); opacity:0; }
+}
+
+/* ── Cricket background system ── */
+.cric-bg {
+  position: relative;
+  min-height: 100%;
+}
+
+.pitch-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='600' viewBox='0 0 900 600'%3E%3Cellipse cx='450' cy='300' rx='420' ry='270' fill='none' stroke='%231d4ed8' stroke-width='2'/%3E%3Cellipse cx='450' cy='300' rx='75' ry='48' fill='none' stroke='%231d4ed8' stroke-width='2'/%3E%3Cline x1='450' y1='30' x2='450' y2='570' stroke='%231d4ed8' stroke-width='1.2'/%3E%3Cline x1='30' y1='300' x2='870' y2='300' stroke='%231d4ed8' stroke-width='1.2'/%3E%3Crect x='395' y='248' width='110' height='104' fill='none' stroke='%23dc2626' stroke-width='1.5'/%3E%3Crect x='375' y='235' width='150' height='130' fill='none' stroke='%23dc2626' stroke-width='1'/%3E%3Ccircle cx='450' cy='300' r='5' fill='%23dc2626' opacity='0.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.lines-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: repeating-linear-gradient(-45deg,#1d4ed8 0px,#1d4ed8 1px,transparent 1px,transparent 32px);
+}
+
+.glass-card {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 4px 24px rgba(29,78,216,0.07), 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.glass-card-red {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(220,38,38,0.22);
+  box-shadow: 0 4px 24px rgba(220,38,38,0.08), 0 1px 4px rgba(0,0,0,0.05);
+}

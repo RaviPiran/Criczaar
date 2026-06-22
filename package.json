@@ -1,0 +1,9 @@
+{
+  "name": "criczaar",
+  "private": true,
+  "scripts": {
+    "frontend": "cd frontend && npm start",
+    "backend":  "cd backend && node server.js",
+    "install:all": "cd frontend && npm install && cd ../backend && npm install"
+  }
+}
