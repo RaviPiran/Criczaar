@@ -24,8 +24,15 @@ const teamSchema = new mongoose.Schema({
   ],
 }, { timestamps: true });
 
-teamSchema.virtual('playerCount').get(function () { return this.players.length; });
-teamSchema.virtual('slotsLeft').get(function () { return this.slots - this.players.length; });
+// FIX: virtuals run on every JSON serialization (res.json), including for
+// legacy team docs where `players` can be null/undefined instead of [].
+// `this.players.length` on such a doc throws "Cannot read properties of
+// undefined (reading 'length')" and kills the ENTIRE /full response (all
+// teams + players), which is why "Enter Auction" failed with no data
+// loading at all. Guard with `?.length || 0` so a bad doc can never take
+// down the whole route again — independent of any DB-side null cleanup.
+teamSchema.virtual('playerCount').get(function () { return this.players?.length || 0; });
+teamSchema.virtual('slotsLeft').get(function () { return this.slots - (this.players?.length || 0); });
 teamSchema.set('toJSON', { virtuals: true });
 teamSchema.set('toObject', { virtuals: true });
 
