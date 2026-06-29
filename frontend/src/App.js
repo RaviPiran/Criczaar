@@ -18,6 +18,7 @@ import { getFullRoom } from './utils/api';
 import PlayerRegister  from './pages/PlayerRegister';
 import LiveSpectator   from './pages/LiveSpectator';
 import PlayerRequests  from './pages/PlayerRequests';
+import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 
 const RehydrateContext = createContext(false);
@@ -44,6 +45,15 @@ function RoomRehydrator({ children }) {
       {children}
     </RehydrateContext.Provider>
   );
+}
+
+function AdminRoute({ children }) {
+  const { user, loading: authLoading } = useAuth();
+  const rehydrated = useRehydrated();
+  if (authLoading || !rehydrated) return <Spinner />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'admin') return <Navigate to="/tournaments" replace />;
+  return children;
 }
 
 const Spinner = () => (
@@ -84,6 +94,7 @@ function AppRoutes() {
       <Route path="/register/:roomCode" element={<PlayerRegister />} />
       <Route path="/live/:roomCode"     element={<LiveSpectator />} />
       <Route path="*"            element={<Navigate to={user ? '/tournaments' : '/login'} replace />} />
+      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
     </Routes>
   );
 }

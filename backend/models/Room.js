@@ -25,6 +25,7 @@ const roomSchema = new mongoose.Schema({
     enum: ['setup', 'active', 'paused', 'completed'],
     default: 'setup',
   },
+  scheduledAt: { type: Date, default: null }, // optional planned start time — drives "Upcoming Auctions"
   currentPlayer: { type: mongoose.Schema.Types.ObjectId, ref: 'Player', default: null },
   currentBid:    { type: Number, default: 0 },
   currentBidder: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', default: null },

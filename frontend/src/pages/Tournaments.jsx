@@ -105,12 +105,18 @@ export default function Tournaments() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="text-sm text-white/60 font-raj hidden sm:block">👋 {user?.name}</div>
-            <button onClick={logout}
-              className="text-xs font-raj font-semibold text-white/40 hover:text-red-400 transition-colors border border-white/10 px-3 py-1.5 rounded-lg hover:border-red-400/40">
-              Logout
-            </button>
-          </div>
+      <div className="text-sm text-white/60 font-raj hidden sm:block">👋 {user?.name}</div>
+      {user?.role === 'admin' && (
+        <button onClick={() => navigate('/admin')}
+          className="text-xs font-raj font-semibold text-red-400 hover:text-red-300 transition-colors border border-red-400/30 px-3 py-1.5 rounded-lg hover:border-red-400/60">
+          🛠 Admin Panel
+        </button>
+      )}
+      <button onClick={logout}
+        className="text-xs font-raj font-semibold text-white/40 hover:text-red-400 transition-colors border border-white/10 px-3 py-1.5 rounded-lg hover:border-red-400/40">
+        Logout
+      </button>
+    </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">

@@ -7,6 +7,7 @@ const connectDB  = require('./config/db');
 
 const app    = express();
 const server = http.createServer(app);
+const protect = require('./middleware/auth');
 const io     = new Server(server, {
   cors: { origin: process.env.CLIENT_URL || 'http://localhost:3000', methods: ['GET','POST','PUT','PATCH','DELETE'] },
 });
@@ -26,6 +27,7 @@ app.use('/api/rooms',   require('./routes/rooms'));
 app.use('/api/teams',   require('./routes/teams'));
 app.use('/api/players', require('./routes/players'));
 app.use('/api/player-requests', require('./routes/playerRequests'));
+app.use('/api/admin', protect, require('./middleware/adminOnly'), require('./routes/admin'));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
@@ -57,7 +59,9 @@ io.on('connection', (socket) => {
   socket.on('next-player',    ({ roomId, player }) => io.to(roomId).emit('next-player', player));
   socket.on('auction-paused', ({ roomId }) => { clearRoomTimer(roomId); io.to(roomId).emit('auction-paused'); });
   socket.on('auction-resumed',({ roomId }) => io.to(roomId).emit('auction-resumed'));
-  socket.on('disconnect', () => {});
+   // Admin dashboard made a live correction (price fix / sent player back to pool)
+   socket.on('admin-update',   ({ roomId }) => io.to(roomId).emit('admin-update'));
+   socket.on('disconnect', () => {});
 });
 
 function clearRoomTimer(roomId) {

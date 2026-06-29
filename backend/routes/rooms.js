@@ -14,7 +14,7 @@ const generateCode = () => {
 // POST /api/rooms — BUG FIX #7: now saves owner from JWT
 router.post('/', protect, async (req, res) => {
   try {
-    const { name, rules, tournament } = req.body;
+    const { name, rules, tournament, scheduledAt } = req.body;
     let code;
     do { code = generateCode(); } while (await Room.findOne({ code }));
     const room = await Room.create({
@@ -22,6 +22,7 @@ router.post('/', protect, async (req, res) => {
       owner: req.user._id,          // ← fixed: track owner
       rules: rules || {},
       tournament: tournament || {},
+      scheduledAt: scheduledAt || null,
     });
     const token = jwt.sign({ roomId: room._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.status(201).json({ success: true, data: room, token });

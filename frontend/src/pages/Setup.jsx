@@ -32,6 +32,7 @@ export default function Setup() {
   const navTournament = location.state?.tournament || { name: '', logo: '' };
 
   const [roomName, setRoomName] = useState('');
+  const [scheduledAt, setScheduledAt] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [rules, setRules] = useState({
     basePrice:100, bidIncrement:10, timerSeconds:30, rtmCards:2, maxPlayers:11,
@@ -82,7 +83,7 @@ export default function Setup() {
       // Clear any previous room from state before creating a new one
       dispatch({ type: 'RESET' });
 
-      const{data:roomRes}=await createRoom({name:roomName,rules,tournament:navTournament});
+      const{data:roomRes}=await createRoom({name:roomName,rules,tournament:navTournament,scheduledAt:scheduledAt||null});
       const room=roomRes.data;
       const createdTeams=await Promise.all(teams.map(t=>
         createTeam({name:t.name,color:t.color,logo:t.logo,budget:t.budget,budgetLeft:t.budget,slots:t.slots,room:room._id,players:[],retainedPlayers:[]})
@@ -229,6 +230,12 @@ export default function Setup() {
               <input className={IC} value={roomName}
                 onChange={e=>setRoomName(e.target.value)}
                 placeholder="e.g. IPL Mega Auction 2025"/>
+            </div>
+            <div>
+              <label className="label">Scheduled Start (optional)</label>
+              <input className={IC} type="datetime-local" value={scheduledAt}
+                onChange={e=>setScheduledAt(e.target.value)}/>
+              <p className="text-xs text-white/30 mt-1 font-raj">Leave blank to start whenever you're ready.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[['Base Price (Pts)','basePrice',0.1,0.1],['Bid Increment (Pts)','bidIncrement',0.1,0.1],
@@ -532,6 +539,7 @@ export default function Setup() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 ['Room',       roomName||'—'],
+                ['Scheduled',  scheduledAt ? new Date(scheduledAt).toLocaleString() : 'Not scheduled'],
                 ['Teams',      teams.length],
                 ['Players',    players.length],
                 ['Retained',   retentions.length],

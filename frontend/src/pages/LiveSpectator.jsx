@@ -142,6 +142,9 @@ export default function LiveSpectator() {
       if (state.currentBidder) setCurrentBidder(state.currentBidder);
     });
 
+    // Admin made a live correction (price fix / sent player back to pool) — refresh everything
+    s.on('admin-update', () => { loadRoom(); pushLog('🛠 Auction data updated by admin', 'info'); });
+
     s.on('disconnect', () => {});
   };
 

@@ -33,6 +33,21 @@ export const retainPlayerAPI  = (id, d) => API.post(`/rooms/${id}/retain`, d);
 export const releaseRetention = (id, playerId) => API.delete(`/rooms/${id}/retain/${playerId}`);
 export const pickUnsoldPlayer = (id, d) => API.post(`/rooms/${id}/pick-unsold`, d);
 
+// Admin
+export const getAdminStats       = ()        => API.get('/admin/stats');
+export const getAdminUsers       = ()        => API.get('/admin/users');
+export const updateUserRole      = (id, role)=> API.patch(`/admin/users/${id}/role`, { role });
+export const deleteUserAPI       = (id)      => API.delete(`/admin/users/${id}`);
+export const getAdminRooms       = ()        => API.get('/admin/rooms');
+export const adminDeleteRoom     = (id)      => API.delete(`/admin/rooms/${id}`);
+export const adminSetRoomStatus  = (id, status) => API.patch(`/admin/rooms/${id}/status`, { status });
+export const adminSetRoomSchedule = (id, scheduledAt) => API.patch(`/admin/rooms/${id}/schedule`, { scheduledAt });
+export const getAdminRoomPlayers = (roomId)  => API.get(`/admin/rooms/${roomId}/players`);
+export const getAdminRoomSnapshot = (roomId) => API.get(`/admin/rooms/${roomId}/snapshot`);
+export const adminCorrectPrice   = (playerId, soldPrice) => API.patch(`/admin/players/${playerId}/price`, { soldPrice });
+export const adminRevertPlayer   = (playerId)=> API.post(`/admin/players/${playerId}/revert`);
+export const getAdminLogs        = (limit=200) => API.get('/admin/logs', { params: { limit } });
+
 // Teams
 export const createTeam    = (d)  => API.post('/teams', d);
 export const getTeamsByRoom= (rid)=> API.get(`/teams/room/${rid}`);

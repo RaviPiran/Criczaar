@@ -268,8 +268,9 @@ export default function Auction() {
     s.on('next-player',    p  => { dispatch({ type:'SET_CURRENT_PLAYER', payload:p }); setTimerSecs(maxTimer); startLocalTimer(); });
     s.on('auction-paused',  () => { setIsPaused(true);  stopLocalTimer();  toast('⏸ Paused',  {icon:'⏸'}); });
     s.on('auction-resumed', () => { setIsPaused(false); startLocalTimer(); toast('▶ Resumed', {icon:'▶'}); });
+    s.on('admin-update',    () => { loadData(); toast('🛠 Auction data updated by admin', { icon: '🛠' }); });
     return () => {
-      ['bid-update','timer-tick','timer-expired','player-result','next-player','auction-paused','auction-resumed']
+      ['bid-update','timer-tick','timer-expired','player-result','next-player','auction-paused','auction-resumed','admin-update']
         .forEach(e => s.off(e));
     };
   }, [room]);
