@@ -61,8 +61,8 @@ export default function PlayerRegister() {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim())  e.name  = 'Full name is required';
-    if (!form.role)         e.role  = 'Playing role is required';
+    if (!form.name.trim()) e.name = 'Full name is required';
+    if (!form.role) e.role = 'Playing role is required';
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Invalid email';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -86,6 +86,24 @@ export default function PlayerRegister() {
       toast.error(err?.response?.data?.message || 'Something went wrong. Try again.');
     }
     setLoading(false);
+  };
+
+  const resetForm = () => {
+    setSubmitted(false);
+
+    setForm({
+      name: '',
+      email: '',
+      phone: '',
+      club: '',
+      role: '',
+      battingStyle: '',
+      bowlingStyle: '',
+      photo: '',
+    });
+
+    setPhotoPreview('');
+    setErrors({});
   };
 
   // ── Loading state ──────────────────────────────────────────────────────────
@@ -126,11 +144,11 @@ export default function PlayerRegister() {
           style={{ background: 'rgba(255,255,255,0.05)' }}>
           <div className="text-white/40 text-xs font-orbitron uppercase tracking-widest mb-3">Your Details</div>
           {[
-            ['Name',  form.name],
-            ['Role',  form.role],
-            ['Club',  form.club],
+            ['Name', form.name],
+            ['Role', form.role],
+            ['Club', form.club],
             ['Email', form.email],
-          ].filter(([,v]) => v).map(([l, v]) => (
+          ].filter(([, v]) => v).map(([l, v]) => (
             <div key={l} className="flex justify-between text-sm">
               <span className="text-white/40 font-raj">{l}</span>
               <span className="text-white font-semibold font-raj">{v}</span>
@@ -140,6 +158,28 @@ export default function PlayerRegister() {
         <p className="text-white/30 text-xs font-raj">
           The auction organiser will review your registration and add you to the player pool.
         </p>
+
+        <div className="flex flex-col gap-3 pt-2">
+          <button
+            onClick={resetForm}
+            className="w-full py-3 rounded-2xl font-display tracking-wide text-white transition-all hover:-translate-y-0.5"
+            style={{
+              background: 'linear-gradient(135deg,#1d4ed8,#2563eb)',
+            }}
+          >
+            ➕ Register Another Player
+          </button>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full py-3 rounded-2xl border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+            }}
+          >
+            🔄 Refresh Page
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -148,7 +188,7 @@ export default function PlayerRegister() {
   return (
     <div className="min-h-screen py-8 px-4"
       style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%)' }}>
-      <Toaster position="top-center"/>
+      <Toaster position="top-center" />
 
       <div className="max-w-lg mx-auto space-y-6">
 
@@ -188,14 +228,14 @@ export default function PlayerRegister() {
               className="w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-red-400/60 transition-all"
               style={{ background: 'rgba(255,255,255,0.04)' }}>
               {photoPreview
-                ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover"/>
+                ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
                 : <div className="text-center">
-                    <div className="text-3xl">📷</div>
-                    <div className="text-[10px] text-white/30 mt-1 font-raj">Photo</div>
-                  </div>}
+                  <div className="text-3xl">📷</div>
+                  <div className="text-[10px] text-white/30 mt-1 font-raj">Photo</div>
+                </div>}
             </div>
             <input id="photo-input" type="file" accept="image/*" className="hidden"
-              onChange={e => e.target.files[0] && handlePhoto(e.target.files[0])}/>
+              onChange={e => e.target.files[0] && handlePhoto(e.target.files[0])} />
             <p className="text-xs text-white/30 font-raj">Optional · Max 2MB</p>
           </div>
 
@@ -207,9 +247,8 @@ export default function PlayerRegister() {
             <input
               value={form.name} onChange={e => set('name', e.target.value)}
               placeholder="Your full name"
-              className={`w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 focus:outline-none transition-all border ${
-                errors.name ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5 focus:border-red-400/60'
-              }`}/>
+              className={`w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 focus:outline-none transition-all border ${errors.name ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5 focus:border-red-400/60'
+                }`} />
             {errors.name && <p className="text-red-400 text-xs mt-1 font-raj">{errors.name}</p>}
           </div>
 
@@ -222,11 +261,10 @@ export default function PlayerRegister() {
               {ROLES.map(r => (
                 <button key={r} type="button"
                   onClick={() => set('role', r)}
-                  className={`py-2.5 rounded-xl text-sm font-raj font-semibold transition-all border ${
-                    form.role === r
+                  className={`py-2.5 rounded-xl text-sm font-raj font-semibold transition-all border ${form.role === r
                       ? 'border-red-500 text-white'
                       : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
-                  }`}
+                    }`}
                   style={form.role === r ? { background: 'linear-gradient(135deg,#dc2626,#1d4ed8)' } : { background: 'rgba(255,255,255,0.03)' }}>
                   {r === 'Batsman' ? '🏏' : r === 'Bowler' ? '⚾' : r === 'All-rounder' ? '⭐' : '🧤'} {r}
                 </button>
@@ -241,11 +279,10 @@ export default function PlayerRegister() {
             <div className="grid grid-cols-2 gap-2">
               {BAT_STYLE.map(s => (
                 <button key={s} type="button" onClick={() => set('battingStyle', s)}
-                  className={`py-2.5 rounded-xl text-sm font-raj font-semibold transition-all border ${
-                    form.battingStyle === s
+                  className={`py-2.5 rounded-xl text-sm font-raj font-semibold transition-all border ${form.battingStyle === s
                       ? 'border-blue-500 text-white'
                       : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
-                  }`}
+                    }`}
                   style={form.battingStyle === s ? { background: 'rgba(29,78,216,0.3)' } : { background: 'rgba(255,255,255,0.03)' }}>
                   {s}
                 </button>
@@ -271,7 +308,7 @@ export default function PlayerRegister() {
             <input
               value={form.club} onChange={e => set('club', e.target.value)}
               placeholder="Your club or local team name"
-              className="w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 border border-white/10 bg-white/5 focus:outline-none focus:border-blue-400/60 transition-all"/>
+              className="w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 border border-white/10 bg-white/5 focus:outline-none focus:border-blue-400/60 transition-all" />
           </div>
 
           {/* Email */}
@@ -280,9 +317,8 @@ export default function PlayerRegister() {
             <input
               value={form.email} onChange={e => set('email', e.target.value)}
               type="email" placeholder="your@email.com"
-              className={`w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 focus:outline-none transition-all border ${
-                errors.email ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5 focus:border-blue-400/60'
-              }`}/>
+              className={`w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 focus:outline-none transition-all border ${errors.email ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5 focus:border-blue-400/60'
+                }`} />
             {errors.email && <p className="text-red-400 text-xs mt-1 font-raj">{errors.email}</p>}
           </div>
 
@@ -292,7 +328,7 @@ export default function PlayerRegister() {
             <input
               value={form.phone} onChange={e => set('phone', e.target.value)}
               type="tel" placeholder="e.g. 9876543210"
-              className="w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 border border-white/10 bg-white/5 focus:outline-none focus:border-blue-400/60 transition-all"/>
+              className="w-full rounded-xl px-4 py-3 text-white font-raj text-base placeholder:text-white/20 border border-white/10 bg-white/5 focus:outline-none focus:border-blue-400/60 transition-all" />
           </div>
 
           {/* Submit */}
