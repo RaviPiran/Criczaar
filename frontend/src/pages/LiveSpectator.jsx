@@ -302,6 +302,12 @@ export default function LiveSpectator() {
                       <div className="text-xs text-white/40 uppercase tracking-widest">Base</div>
                       <div className="font-orbitron text-sm text-white/50">{currentPlayer.basePrice} pts</div>
                     </div>
+                    {room?.rules?.maxPlayerPrice ? (
+                      <div>
+                        <div className="text-xs text-white/40 uppercase tracking-widest">Max/Player Cap</div>
+                        <div className="font-orbitron text-sm text-red-400">{room.rules.maxPlayerPrice} pts</div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
@@ -366,6 +372,17 @@ export default function LiveSpectator() {
               const tp     = getTeamPlayers(team);
               const spent  = (team.budget || 0) - (team.budgetLeft ?? 0);
               const pct    = Math.min(Math.round((spent / (team.budget || 1)) * 100), 100);
+              const slotsLeft = (team.slots || 11) - tp.length;
+              const basePrice = room?.rules?.basePrice || 0;
+              const maxPlayerPrice = room?.rules?.maxPlayerPrice;
+              // Max a team can bid on one player: budget left minus (basePrice × remaining slots after this one)
+              const computedMax = slotsLeft > 0
+                ? Math.max(0, Math.round((team.budgetLeft ?? 0) - basePrice * (slotsLeft - 1)))
+                : 0;
+              // If room has a hard cap, respect it too
+              const maxBid = maxPlayerPrice
+                ? Math.min(computedMax, maxPlayerPrice)
+                : computedMax;
               return (
                 <div key={team._id} className="rounded-2xl overflow-hidden border border-white/8"
                   style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)' }}>
@@ -379,12 +396,27 @@ export default function LiveSpectator() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-display text-lg text-white truncate">{team.name}</div>
-                        <div className="text-xs text-white/40">{tp.length} players · {Math.round(team.budgetLeft ?? 0)} pts left</div>
+                        <div className="text-xs text-white/40">{tp.length}/{team.slots || 11} players</div>
                       </div>
                     </div>
                     {/* Budget bar */}
                     <div className="w-full bg-white/10 rounded-full h-1.5 mb-3 overflow-hidden">
                       <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: 'linear-gradient(90deg,#dc2626,#1d4ed8)' }}/>
+                    </div>
+                    {/* Budget Left + Max/Player row */}
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <div className="text-[9px] text-white/30 font-raj uppercase tracking-widest">Budget Left</div>
+                        <div className="font-orbitron font-bold text-sm" style={{ color: (team.budgetLeft ?? 0) < 100 ? '#f87171' : '#34d399' }}>
+                          {Math.round(team.budgetLeft ?? 0)} pts
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[9px] text-white/30 font-raj uppercase tracking-widest">Max/Player</div>
+                        <div className="font-orbitron font-bold text-sm" style={{ color: slotsLeft === 0 ? '#6b7280' : '#fbbf24' }}>
+                          {slotsLeft === 0 ? '— full' : `${maxBid} pts`}
+                        </div>
+                      </div>
                     </div>
                     {/* Players */}
                     <div className="space-y-1.5 max-h-44 overflow-y-auto">

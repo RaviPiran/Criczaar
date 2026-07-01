@@ -28,11 +28,18 @@ export default function PlayerRequests() {
   const [requests,   setRequests]   = useState([]);
   const [counts,     setCounts]     = useState({ pending: 0, approved: 0, rejected: 0 });
   const [loading,    setLoading]    = useState(false);
-  const [actioning,  setActioning]  = useState(null);  // id being approved/rejected
-  const [rejectId,   setRejectId]   = useState(null);  // id showing reject dialog
+  const [actioning,  setActioning]  = useState(null);
+  const [rejectId,   setRejectId]   = useState(null);
   const [rejectMsg,  setRejectMsg]  = useState('');
-  const [basePrice,  setBasePrice]  = useState('');    // per-player override on approve
-  const [approveId,  setApproveId]  = useState(null);  // id showing approve dialog
+  const [basePrice,  setBasePrice]  = useState('');
+  const [approveId,  setApproveId]  = useState(null);
+
+  // Multi-select
+  const [selected,      setSelected]      = useState(new Set());
+  const [bulkActioning, setBulkActioning] = useState(false);
+
+  // Reset selection when tab changes
+  useEffect(() => { setSelected(new Set()); }, [tab]);
 
   // Build the webhook URL for display
   const webhookUrl = room
@@ -97,6 +104,58 @@ export default function PlayerRequests() {
       toast.success('Deleted');
       fetchRequests();
     } catch { toast.error('Delete failed'); }
+  };
+
+  const toggleSelect = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === requests.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(requests.map(r => r._id)));
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (!selected.size) return;
+    if (!window.confirm(`Approve ${selected.size} player${selected.size > 1 ? 's' : ''}?`)) return;
+    setBulkActioning(true);
+    let ok = 0, fail = 0;
+    for (const id of selected) {
+      try {
+        await API.post(`/player-requests/${id}/approve`, {});
+        ok++;
+      } catch { fail++; }
+    }
+    setBulkActioning(false);
+    setSelected(new Set());
+    if (ok)   toast.success(`✅ ${ok} player${ok > 1 ? 's' : ''} approved!`);
+    if (fail) toast.error(`${fail} failed`);
+    fetchRequests();
+  };
+
+  const handleBulkReject = async () => {
+    if (!selected.size) return;
+    if (!window.confirm(`Reject ${selected.size} player${selected.size > 1 ? 's' : ''}?`)) return;
+    setBulkActioning(true);
+    let ok = 0, fail = 0;
+    for (const id of selected) {
+      try {
+        await API.post(`/player-requests/${id}/reject`, { reason: 'Bulk rejected' });
+        ok++;
+      } catch { fail++; }
+    }
+    setBulkActioning(false);
+    setSelected(new Set());
+    if (ok)   toast.success(`${ok} rejected`);
+    if (fail) toast.error(`${fail} failed`);
+    fetchRequests();
   };
 
   if (!room) return (
@@ -226,17 +285,58 @@ export default function PlayerRequests() {
           </div>
         ) : (
           <div className="space-y-3">
+
+            {/* Bulk action toolbar — only on pending tab */}
+            {tab === 'pending' && requests.length > 0 && (
+              <div className="flex items-center gap-3 px-2 py-2 rounded-xl border border-slate-200 bg-white/60">
+                <label className="flex items-center gap-2 cursor-pointer flex-shrink-0">
+                  <input type="checkbox"
+                    checked={selected.size === requests.length && requests.length > 0}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 accent-emerald-500 rounded cursor-pointer"/>
+                  <span className="text-xs font-raj text-slate-500">
+                    {selected.size === 0 ? 'Select all' : `${selected.size} selected`}
+                  </span>
+                </label>
+                {selected.size > 0 && (
+                  <>
+                    <div className="w-px h-5 bg-slate-200"/>
+                    <button onClick={handleBulkApprove} disabled={bulkActioning}
+                      className="px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-all disabled:opacity-40 flex items-center gap-1.5">
+                      {bulkActioning ? '⏳' : '✅'} Approve {selected.size}
+                    </button>
+                    <button onClick={handleBulkReject} disabled={bulkActioning}
+                      className="px-4 py-1.5 text-xs font-bold rounded-lg border border-red-300 text-red-500 hover:bg-red-50 transition-all disabled:opacity-40 flex items-center gap-1.5">
+                      {bulkActioning ? '⏳' : '❌'} Reject {selected.size}
+                    </button>
+                    <button onClick={() => setSelected(new Set())}
+                      className="ml-auto text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                      Clear
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
             {requests.map(req => (
               <div key={req._id}
-                className="glass-card rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                className={`glass-card rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 transition-all ${selected.has(req._id) ? 'ring-2 ring-emerald-400 ring-offset-1' : ''}`}>
 
-                {/* Avatar */}
-                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-slate-200 flex-shrink-0">
-                  {req.photo
-                    ? <img src={req.photo} alt={req.name} className="w-full h-full object-cover"/>
-                    : <div className="w-full h-full bg-gradient-to-br from-blue-100 to-red-100 flex items-center justify-center font-display text-2xl text-blue-600">
-                        {req.name[0]}
-                      </div>}
+                {/* Checkbox + Avatar */}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  {tab === 'pending' && (
+                    <input type="checkbox"
+                      checked={selected.has(req._id)}
+                      onChange={() => toggleSelect(req._id)}
+                      className="w-4 h-4 accent-emerald-500 rounded cursor-pointer flex-shrink-0"/>
+                  )}
+                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-slate-200 flex-shrink-0">
+                    {req.photo
+                      ? <img src={req.photo} alt={req.name} className="w-full h-full object-cover"/>
+                      : <div className="w-full h-full bg-gradient-to-br from-blue-100 to-red-100 flex items-center justify-center font-display text-2xl text-blue-600">
+                          {req.name[0]}
+                        </div>}
+                  </div>
                 </div>
 
                 {/* Info */}
