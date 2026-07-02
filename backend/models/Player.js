@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const playerSchema = new mongoose.Schema({
   name: { type: String, required: [true, 'Player name is required'], trim: true },
+  phone: { type: String, default: '', trim: true },
   club: { type: String, default: '', trim: true },
   battingStyle: {
     type: String,

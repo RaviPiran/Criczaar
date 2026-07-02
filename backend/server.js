@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/api/auth',    require('./routes/auth'));
 app.use('/api/rooms',   require('./routes/rooms'));
+app.use('/api/rooms',   require('./routes/playerPdf'));
 app.use('/api/teams',   require('./routes/teams'));
 app.use('/api/players', require('./routes/players'));
 app.use('/api/player-requests', require('./routes/playerRequests'));

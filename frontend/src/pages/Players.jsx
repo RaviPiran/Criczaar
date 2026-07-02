@@ -109,9 +109,35 @@ export default function Players() {
           <h2 className="font-display text-3xl text-slate-900 tracking-wide">👥 Players</h2>
           <p className="text-slate-400 text-sm mt-1">{players.length} players registered</p>
         </div>
-        <button className="btn-primary px-5 py-2.5 text-sm" onClick={() => setShowAdd(s => !s)}>
-          {showAdd ? '✕ Close Form' : '+ Add Player'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            title="Download Player Logbook (landscape A4, 16 cards/page)"
+            onClick={async () => {
+              try {
+                const token = localStorage.getItem('ca_token');
+                const base  = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+                const res   = await fetch(`${base}/api/rooms/${room?._id}/players-pdf`, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error('PDF generation failed');
+                const blob = await res.blob();
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement('a');
+                a.href     = url;
+                a.download = `${room?.name || 'players'}_logbook.pdf`;
+                a.click();
+                URL.revokeObjectURL(url);
+              } catch (e) {
+                toast.error('Failed to download logbook');
+              }
+            }}
+            className="px-4 py-2.5 text-sm font-raj font-bold rounded-xl border border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all flex items-center gap-1.5">
+            📄 Download Logbook
+          </button>
+          <button className="btn-primary px-5 py-2.5 text-sm" onClick={() => setShowAdd(s => !s)}>
+            {showAdd ? '✕ Close Form' : '+ Add Player'}
+          </button>
+        </div>
       </div>
 
       {/* Filter pills */}

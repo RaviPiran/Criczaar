@@ -119,6 +119,7 @@ router.post('/:id/approve', protect, async (req, res) => {
     // Create the actual Player in the auction
     const player = await Player.create({
       name:         request.name,
+      phone:        request.phone || '',
       club:         request.club,
       role:         request.role,
       battingStyle: request.battingStyle,
