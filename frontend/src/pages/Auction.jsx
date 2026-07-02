@@ -558,216 +558,248 @@ export default function Auction() {
             loading={loading}
           />
         ) : currentPlayer ? (
-          <div className={`flex-shrink-0 transition-opacity duration-300 ${isPaused ? 'opacity-60' : ''}`}>
-            <PlayerProfileCard player={currentPlayer} size="large"/>
-          </div>
-        ) : null}
-
-        {/* BID SECTION */}
-        <div className="flex-shrink-0 glass-card rounded-2xl p-5 space-y-4">
-          {/* Current bid */}
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-1">Current Bid</div>
-              <div className="font-orbitron font-black text-5xl leading-none" style={{color:'#dc2626'}}>
-                {Math.round(currentBid)}<span className="text-2xl ml-1" style={{color:'#fca5a5'}}> pts</span>
-              </div>
-              <div className="text-sm text-slate-500 mt-1">
-                {winningTeam
-                  ? <span className="font-bold" style={{color:winningTeam.color}}>🏆 {winningTeam.name} is leading</span>
-                  : 'No bid yet — base price'}
-              </div>
+          <div className={`flex-shrink-0 flex gap-3 items-stretch transition-opacity duration-300 ${isPaused ? 'opacity-60' : ''}`}>
+            {/* Player card — widened for a bigger photo, matched to bid panel's height */}
+            <div className="w-[700px] flex-shrink-0">
+              <PlayerProfileCard player={currentPlayer} size="large"/>
             </div>
-            <div className="flex items-center gap-4">
-              <TimerRing seconds={timerSecs} maxSeconds={maxTimer}/>
-              <div className="hidden sm:block">
-                <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-2">Progress</div>
-                <div className="w-32">
-                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-1">
-                    <div className="h-full rounded-full transition-all"
-                      style={{width:`${pct}%`, background:'linear-gradient(90deg,#dc2626,#1d4ed8)'}}/>
-                  </div>
-                  <div className="flex gap-2 text-[10px] text-slate-400 font-orbitron">
-                    <span>✅{sold}</span><span>❌{unsold}</span><span>⏳{remain}</span>
+            {/* Current Bid + Timer panel */}
+            <div className="flex-1 glass-card rounded-2xl p-5 flex items-center gap-10 flex-wrap min-w-[200px]">
+              <div>
+                <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-1">Current Bid</div>
+                <div className="font-orbitron font-black text-5xl leading-none" style={{color:'#dc2626'}}>
+                  {Math.round(currentBid)}<span className="text-2xl ml-1" style={{color:'#fca5a5'}}> pts</span>
+                </div>
+                <div className="text-sm text-slate-500 mt-1">
+                  {winningTeam
+                    ? <span className="font-bold" style={{color:winningTeam.color}}>🏆 {winningTeam.name} is leading</span>
+                    : 'No bid yet — base price'}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <TimerRing seconds={timerSecs} maxSeconds={maxTimer}/>
+                <div className="hidden sm:block">
+                  <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-2">Progress</div>
+                  <div className="w-32">
+                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-1">
+                      <div className="h-full rounded-full transition-all"
+                        style={{width:`${pct}%`, background:'linear-gradient(90deg,#dc2626,#1d4ed8)'}}/>
+                    </div>
+                    <div className="flex gap-2 text-[10px] text-slate-400 font-orbitron">
+                      <span>✅{sold}</span><span>❌{unsold}</span><span>⏳{remain}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        ) : null}
 
-          {/* Active bonus */}
-          {activeBonusRule && (
-            <div className="rounded-xl px-4 py-2.5 text-sm flex items-center gap-2 border"
-              style={{background:'rgba(29,78,216,0.06)', borderColor:'rgba(29,78,216,0.25)', color:'#1d4ed8'}}>
-              <span className="text-xl">🎯</span>
-              <span><strong>{activeBonusRule.label}</strong> — selling here awards <strong>+{activeBonusRule.bonusPoints} bonus points!</strong></span>
-            </div>
-          )}
+        {/* TEAM BID GRID — moved here from the sidebar; wide column = room for up to 5 cards per row, easier to bid at a glance */}
+        <div className="flex-shrink-0 glass-card rounded-2xl p-4">
+          <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-3 px-1">🛡 Teams — Click to Bid</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            {teams.map(t => {
+              const isWin      = (currentBidder?._id || currentBidder?.id || currentBidder) === t._id;
+              const slotsLeft  = t.slots - (t.players?.length || 0);
+              const maxBid     = getMaxBid(t);
+              const budgetPct  = Math.round(((t.budget - t.budgetLeft) / t.budget) * 100);
+              const nextBidAmt = Math.round(currentBid + getNextIncrement(currentBid));
+              const wouldExceed = nextBidAmt > maxBid;
+              const nextBidBonus = room?.rules?.bidBonusRules?.find(r => nextBidAmt >= r.minBid && nextBidAmt <= r.maxBid);
 
-          {/* Bonus pills */}
-          {room?.rules?.bidBonusRules?.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {room.rules.bidBonusRules.map((r,i) => {
-                const isActive = currentBid >= r.minBid && currentBid <= r.maxBid;
-                return (
-                  <div key={i} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all
-                    ${isActive ? 'font-bold shadow-sm' : ''}`}
-                    style={isActive
-                      ? {background:'rgba(29,78,216,0.08)', borderColor:'rgba(29,78,216,0.4)', color:'#1d4ed8'}
-                      : {background:'#f8fafc', borderColor:'#e2e8f0', color:'#94a3b8'}}>
-                    {isActive && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{background:'#1d4ed8'}}/>}
-                    <span>{r.label}</span>
-                    <span className="font-orbitron" style={isActive?{color:'#1d4ed8'}:{color:'#94a3b8'}}>+{r.bonusPoints}pts</span>
-                    <span className="opacity-50">{r.minBid}–{r.maxBid===9999?'∞':r.maxBid} pts</span>
+              return (
+                <div key={t._id}
+                  className={`rounded-2xl border transition-all overflow-hidden ${isWin ? 'border-emerald-300 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'}`}
+                  style={isWin ? {background:'rgba(5,150,105,0.04)'} : {}}>
+
+                  <div className="h-1.5 w-full" style={{background: isWin ? 'linear-gradient(90deg,#dc2626,#b91c1c)' : t.color}}/>
+
+                  <div className="p-3">
+                    {/* Header row */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-9 h-9 rounded-full overflow-hidden border-2 flex-shrink-0" style={{borderColor:t.color}}>
+                        {t.logo
+                          ? <img src={t.logo} alt={t.name} className="w-full h-full object-cover"/>
+                          : <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white" style={{background:t.color}}>{t.name[0]}</div>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold truncate text-slate-800 leading-tight">{t.name}</div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <div className="flex gap-0.5">
+                            {Array.from({length: t.slots}).map((_,i) => (
+                              <div key={i} className="w-2 h-2 rounded-sm"
+                                style={{background: i < (t.players?.length||0) ? t.color : '#e2e8f0'}}/>
+                            ))}
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-raj">{t.players?.length||0}/{t.slots}</span>
+                        </div>
+                      </div>
+                      {isWin && (
+                        <span className="text-[10px] font-black text-emerald-600 border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 rounded-full flex-shrink-0 tracking-wide">LEAD</span>
+                      )}
+                    </div>
+
+                    {/* Budget bar */}
+                    <div className="mb-2">
+                      <div className="flex justify-between text-[10px] mb-1">
+                        <span className="text-slate-400 font-raj">Budget left</span>
+                        <span className="font-orbitron font-bold" style={{color: t.budgetLeft < 100 ? '#dc2626' : t.color}}>
+                          {Math.round(t.budgetLeft)} <span className="font-normal text-slate-400">pts</span>
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500"
+                          style={{width:`${budgetPct}%`, background:`linear-gradient(90deg,${t.color},#dc2626)`}}/>
+                      </div>
+                    </div>
+
+                    {/* Max bid per player row */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-slate-400 font-raj">Max/player</span>
+                        <span title={`Max points this team can spend on ONE player while keeping ${room?.rules?.basePrice||100} pts per remaining slot`}
+                          className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-500 text-[9px] flex items-center justify-center cursor-help font-bold">?</span>
+                      </div>
+                      <span className={`font-orbitron text-[11px] font-bold px-2 py-0.5 rounded-lg ${
+                        slotsLeft === 0 ? 'text-slate-400 bg-slate-100' :
+                        wouldExceed    ? 'text-orange-600 bg-orange-50 border border-orange-200' :
+                                         'text-blue-700 bg-blue-50 border border-blue-200'
+                      }`}>
+                        {slotsLeft === 0 ? '— full' : `${maxBid} pts`}
+                      </span>
+                    </div>
+
+                    {/* Bonus tier hint — surfaces the bid rules right on the card */}
+                    {nextBidBonus && !wouldExceed && slotsLeft > 0 && (
+                      <div className="flex items-center gap-1 mb-1.5 text-[9px] font-bold" style={{color:'#059669'}}>
+                        <span>🎯</span>
+                        <span>{nextBidBonus.label} tier — +{nextBidBonus.bonusPoints} bonus pts</span>
+                      </div>
+                    )}
+
+                    {/* BID button */}
+                    <button onClick={() => handleBid(t._id)}
+                      disabled={!currentPlayer || isPaused || slotsLeft === 0}
+                      title={slotsLeft === 0 ? 'Squad full' : wouldExceed ? `Next bid (${nextBidAmt}) exceeds max allowed (${maxBid})` : `Bid ${nextBidAmt} pts`}
+                      className={`w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold font-raj tracking-widest transition-all uppercase
+                        text-white disabled:opacity-30 disabled:cursor-not-allowed
+                        ${!(slotsLeft === 0 || wouldExceed) ? 'hover:-translate-y-0.5 hover:shadow-md' : ''}`}
+                      style={{
+                        background: slotsLeft === 0
+                          ? '#94a3b8'
+                          : wouldExceed
+                            ? 'linear-gradient(135deg,#f97316,#ea580c)'
+                            : isWin
+                              ? 'linear-gradient(135deg,#dc2626,#b91c1c)'
+                              : `linear-gradient(135deg,${t.color},#1d4ed8)`,
+                        boxShadow: isWin && slotsLeft > 0 ? '0 4px 12px rgba(220,38,38,0.35)' : 'none',
+                      }}>
+                      {slotsLeft === 0
+                        ? <>🔒 Squad Full</>
+                        : wouldExceed
+                          ? <>⚠ Bid {nextBidAmt} pts</>
+                          : <>🏏 Bid {nextBidAmt} pts {nextBidBonus && <span className="opacity-90">🎯</span>}</>}
+                    </button>
                   </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Raise bid */}
-          <div className="flex gap-2 flex-wrap">
-            <span className="text-xs text-slate-400 font-orbitron self-center tracking-widest uppercase mr-1">Raise Bid:</span>
-            {[10, 25, 50, 100, 200].map(inc => (
-              <button key={inc} onClick={() => manualInc(inc)}
-                disabled={!currentPlayer || isPaused}
-                className="px-4 py-2 rounded-xl text-sm font-raj font-bold border border-slate-300 bg-white
-                  hover:border-blue-500 hover:text-blue-600 transition-all disabled:opacity-30">
-                +{inc} pts
-              </button>
-            ))}
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex gap-2 flex-wrap">
-            <button
-              className="px-6 py-3 text-base font-display tracking-widest flex-1 min-w-[120px] rounded-lg text-white font-bold transition-all hover:-translate-y-0.5 disabled:opacity-40"
-              style={{background:'linear-gradient(135deg,#059669,#0d9488)'}}
-              onClick={() => { stopLocalTimer(); setSelectedTeam(winningTeam?._id||null); setPickModal(true); }}
-              disabled={!currentPlayer || loading || isPaused}>
-              🏏 PICK PLAYER
-            </button>
-            <button className="btn-red px-6 py-3 text-base font-display tracking-widest flex-1 min-w-[100px]"
-              onClick={handleUnsold} disabled={!currentPlayer || loading || isPaused}>
-              ❌ UNSOLD
-            </button>
-            <button onClick={handlePauseResume}
-              className="px-5 py-3 font-display tracking-widest text-base rounded-lg border transition-all flex-shrink-0"
-              style={isPaused
-                ? {background:'#eab308', color:'white', borderColor:'#eab308'}
-                : {background:'rgba(234,179,8,0.08)', borderColor:'rgba(234,179,8,0.4)', color:'#854d0e'}}>
-              {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
-            </button>
-            <button className="btn-blue px-5 py-3 text-base font-display tracking-widest flex-shrink-0"
-              onClick={handleNext} disabled={loading || isPaused}>
-              ➡ NEXT
-            </button>
-            <button
-              className="px-5 py-3 text-sm font-display tracking-widest rounded-lg text-white font-bold border-0 flex-shrink-0 transition-all hover:-translate-y-0.5 disabled:opacity-40"
-              style={{background:'linear-gradient(135deg,#7c3aed,#dc2626)'}}
-              onClick={handleCompleteAuction} disabled={loading}
-              title="Mark auction as complete (unsold players will remain unsold)">
-              🏆 FINISH
-            </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* ══ RIGHT PANEL ══ */}
       <div className="w-80 border-l border-white/60 flex flex-col overflow-hidden flex-shrink-0" style={{background:"rgba(255,255,255,0.82)", backdropFilter:"blur(12px)"}}>
-        <div className="section-title">🛡 Teams — Click to Bid</div>
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {teams.map(t => {
-            const isWin      = (currentBidder?._id || currentBidder?.id || currentBidder) === t._id;
-            const slotsLeft  = t.slots - (t.players?.length || 0);
-            const maxBid     = getMaxBid(t);
-            const budgetPct  = Math.round(((t.budget - t.budgetLeft) / t.budget) * 100);
-            const canBid     = slotsLeft > 0 && currentBid < maxBid;
-            const nextBidAmt = Math.round(currentBid + getNextIncrement(currentBid));
-            const wouldExceed = nextBidAmt > maxBid;
+        <div className="section-title">🎯 Bid Rules</div>
+        <div className="flex-shrink-0 p-3 space-y-3">
+          {/* Active bonus */}
+          {activeBonusRule && (
+            <div className="rounded-xl px-3 py-2.5 text-xs flex items-center gap-2 border"
+              style={{background:'rgba(29,78,216,0.06)', borderColor:'rgba(29,78,216,0.25)', color:'#1d4ed8'}}>
+              <span className="text-lg">🎯</span>
+              <span><strong>{activeBonusRule.label}</strong> — selling here awards <strong>+{activeBonusRule.bonusPoints} pts!</strong></span>
+            </div>
+          )}
 
-            return (
-              <div key={t._id}
-                className={`rounded-2xl border transition-all overflow-hidden ${isWin ? 'border-emerald-300 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'}`}
-                style={isWin ? {background:'rgba(5,150,105,0.04)'} : {}}>
-
-                {/* Team colour top strip */}
-                <div className="h-1 w-full" style={{background: t.color}}/>
-
-                <div className="p-3">
-                  {/* Header row */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-9 h-9 rounded-full overflow-hidden border-2 flex-shrink-0" style={{borderColor:t.color}}>
-                      {t.logo
-                        ? <img src={t.logo} alt={t.name} className="w-full h-full object-cover"/>
-                        : <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white" style={{background:t.color}}>{t.name[0]}</div>}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold truncate text-slate-800 leading-tight">{t.name}</div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        {/* Slots pip bar */}
-                        <div className="flex gap-0.5">
-                          {Array.from({length: t.slots}).map((_,i) => (
-                            <div key={i} className="w-2 h-2 rounded-sm"
-                              style={{background: i < (t.players?.length||0) ? t.color : '#e2e8f0'}}/>
-                          ))}
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-raj">{t.players?.length||0}/{t.slots}</span>
-                      </div>
-                    </div>
-                    {isWin && (
-                      <span className="text-[10px] font-black text-emerald-600 border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 rounded-full flex-shrink-0 tracking-wide">LEAD</span>
-                    )}
-                  </div>
-
-                  {/* Budget bar */}
-                  <div className="mb-2">
-                    <div className="flex justify-between text-[10px] mb-1">
-                      <span className="text-slate-400 font-raj">Budget left</span>
-                      <span className="font-orbitron font-bold" style={{color: t.budgetLeft < 100 ? '#dc2626' : t.color}}>
-                        {Math.round(t.budgetLeft)} <span className="font-normal text-slate-400">pts</span>
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                      <div className="h-full rounded-full transition-all duration-500"
-                        style={{width:`${budgetPct}%`, background:`linear-gradient(90deg,${t.color},#dc2626)`}}/>
-                    </div>
-                  </div>
-
-                  {/* Max bid per player row */}
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-1">
-                      <span className="text-[10px] text-slate-400 font-raj">Max/player</span>
-                      <span title={`Max points this team can spend on ONE player while keeping ${room?.rules?.basePrice||100} pts per remaining slot`}
-                        className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-500 text-[9px] flex items-center justify-center cursor-help font-bold">?</span>
-                    </div>
-                    <span className={`font-orbitron text-[11px] font-bold px-2 py-0.5 rounded-lg ${
-                      slotsLeft === 0 ? 'text-slate-400 bg-slate-100' :
-                      wouldExceed    ? 'text-orange-600 bg-orange-50 border border-orange-200' :
-                                       'text-blue-700 bg-blue-50 border border-blue-200'
-                    }`}>
-                      {slotsLeft === 0 ? '— full' : `${maxBid} pts`}
+          {/* Bonus pills */}
+          {room?.rules?.bidBonusRules?.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              {room.rules.bidBonusRules.map((r,i) => {
+                const isActive = currentBid >= r.minBid && currentBid <= r.maxBid;
+                return (
+                  <div key={i} className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all
+                    ${isActive ? 'font-bold shadow-sm' : ''}`}
+                    style={isActive
+                      ? {background:'rgba(29,78,216,0.08)', borderColor:'rgba(29,78,216,0.4)', color:'#1d4ed8'}
+                      : {background:'#f8fafc', borderColor:'#e2e8f0', color:'#94a3b8'}}>
+                    <span className="flex items-center gap-1.5">
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0" style={{background:'#1d4ed8'}}/>}
+                      {r.label}
+                    </span>
+                    <span className="flex items-center gap-1.5 flex-shrink-0">
+                      <span className="font-orbitron" style={isActive?{color:'#1d4ed8'}:{color:'#94a3b8'}}>+{r.bonusPoints}pts</span>
+                      <span className="opacity-50">{r.minBid}–{r.maxBid===9999?'∞':r.maxBid}</span>
                     </span>
                   </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
-                  {/* BID button */}
-                  <button onClick={() => handleBid(t._id)}
-                    disabled={!currentPlayer || isPaused || slotsLeft === 0}
-                    title={slotsLeft === 0 ? 'Squad full' : wouldExceed ? `Next bid (${nextBidAmt}) exceeds max allowed (${maxBid})` : `Bid ${nextBidAmt} pts`}
-                    className={`w-full py-2 rounded-xl text-xs font-bold font-raj tracking-widest transition-all uppercase
-                      ${isWin ? 'text-white' : 'text-white hover:opacity-90'}
-                      disabled:opacity-30 disabled:cursor-not-allowed`}
-                    style={{background: slotsLeft === 0 ? '#94a3b8' : isWin ? '#dc2626' : wouldExceed ? '#f97316' : '#1d4ed8'}}>
-                    {slotsLeft === 0 ? '🔒 Full' : wouldExceed ? `⚠ BID ${nextBidAmt}` : `🏏 BID ${nextBidAmt} pts`}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+        <div className="section-title">📈 Raise Bid</div>
+        <div className="flex-shrink-0 p-3 flex flex-wrap gap-2">
+          {[10, 25, 50, 100, 200].map(inc => (
+            <button key={inc} onClick={() => manualInc(inc)}
+              disabled={!currentPlayer || isPaused}
+              className="flex-1 min-w-[70px] px-3 py-2.5 rounded-xl text-sm font-raj font-bold border border-slate-300 bg-white
+                hover:border-blue-500 hover:text-blue-600 transition-all disabled:opacity-30">
+              +{inc} pts
+            </button>
+          ))}
+        </div>
+
+        <div className="section-title">⚡ Auction Controls</div>
+        <div className="flex-shrink-0 p-3 space-y-2.5">
+          <button
+            className="w-full px-6 py-3.5 text-base font-display tracking-widest rounded-xl text-white font-bold transition-all hover:-translate-y-0.5 disabled:opacity-40"
+            style={{background:'linear-gradient(135deg,#059669,#0d9488)'}}
+            onClick={() => { stopLocalTimer(); setSelectedTeam(winningTeam?._id||null); setPickModal(true); }}
+            disabled={!currentPlayer || loading || isPaused}>
+            🏏 PICK PLAYER
+          </button>
+
+          <button className="btn-red w-full px-6 py-3.5 text-base font-display tracking-widest rounded-xl"
+            onClick={handleUnsold} disabled={!currentPlayer || loading || isPaused}>
+            ❌ UNSOLD
+          </button>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <button onClick={handlePauseResume}
+              className="px-3 py-3 font-display tracking-widest text-sm rounded-xl border transition-all"
+              style={isPaused
+                ? {background:'#eab308', color:'white', borderColor:'#eab308'}
+                : {background:'rgba(234,179,8,0.08)', borderColor:'rgba(234,179,8,0.4)', color:'#854d0e'}}>
+              {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
+            </button>
+            <button className="btn-blue px-3 py-3 text-sm font-display tracking-widest rounded-xl"
+              onClick={handleNext} disabled={loading || isPaused}>
+              ➡ NEXT
+            </button>
+          </div>
+
+          <button
+            className="w-full px-5 py-3 text-sm font-display tracking-widest rounded-xl text-white font-bold border-0 transition-all hover:-translate-y-0.5 disabled:opacity-40"
+            style={{background:'linear-gradient(135deg,#7c3aed,#dc2626)'}}
+            onClick={handleCompleteAuction} disabled={loading}
+            title="Mark auction as complete (unsold players will remain unsold)">
+            🏆 FINISH AUCTION
+          </button>
         </div>
 
         <div className="section-title">📋 Bid Log</div>
-        <div className="h-48 overflow-y-auto p-3 space-y-1">
+        <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {(room.auctionLog||[]).slice().reverse().slice(0,25).map((e,i) => (
             <div key={i} className={`text-xs px-2.5 py-1.5 rounded-lg font-raj
               ${e.type==='sold'    ? 'text-emerald-700 bg-emerald-50'
