@@ -197,6 +197,37 @@ router.post('/:id/bid', protect, async (req, res) => {
   }
 });
 
+// POST /api/rooms/:id/team-bid  (public — for the team's own /team/:roomCode page)
+// Same effect as POST /:id/bid, but auth is the team's own code instead of
+// an admin JWT, since this is called directly from a team owner's device.
+router.post('/:id/team-bid', async (req, res) => {
+  try {
+    const { teamId, teamCode, amount } = req.body;
+    const room = await Room.findById(req.params.id);
+    if (!room || !room.currentPlayer) return res.status(400).json({ success: false, message: 'No active auction' });
+    if (room.status === 'paused') return res.status(400).json({ success: false, message: 'Auction is paused' });
+
+    const team = await Team.findOne({ _id: teamId, room: req.params.id, teamCode: (teamCode || '').trim().toUpperCase() });
+    if (!team) return res.status(401).json({ success: false, message: 'Invalid team code' });
+    if (amount > team.budgetLeft) return res.status(400).json({ success: false, message: 'Insufficient budget' });
+    if (amount <= room.currentBid)  return res.status(400).json({ success: false, message: 'Bid must be higher' });
+
+    let bonusLabel = '';
+    if (room.rules?.bidBonusRules?.length) {
+      const match = room.rules.bidBonusRules.find(r => amount >= r.minBid && amount <= r.maxBid);
+      if (match) bonusLabel = ` [+${match.bonusPoints} pts bonus]`;
+    }
+
+    room.currentBid    = amount;
+    room.currentBidder = team._id;
+    room.auctionLog.push({ message: `${team.name} bids ${amount} pts${bonusLabel}`, type: 'bid' });
+    await room.save();
+    res.json({ success: true, data: { currentBid: amount, currentBidder: team } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // POST /api/rooms/:id/sell
 router.post('/:id/sell', protect, async (req, res) => {
   try {

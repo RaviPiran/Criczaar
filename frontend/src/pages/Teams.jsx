@@ -9,6 +9,28 @@ import CricBg from '../components/CricBg';
 const COLORS = ['#ef4444','#3b82f6','#10b981','#f59e0b','#06b6d4','#f97316','#a855f7','#f43f5e','#14b8a6','#eab308'];
 function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
 
+// Shows this team's bidding link + code (only known to admin — teamCode is
+// hidden from every public endpoint, only returned here via the protected
+// GET /teams/room/:roomId call).
+function TeamBidLink({ team, roomCode }) {
+  const link = `${window.location.origin}/team/${roomCode}`;
+  const copy = (text, label) => { navigator.clipboard.writeText(text); toast.success(`${label} copied!`); };
+  if (!team.teamCode) return null;
+  return (
+    <div className="glass-card rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
+      <div className="min-w-0">
+        <div className="text-slate-400 uppercase tracking-widest text-[10px]">Bid Link · Code</div>
+        <div className="truncate font-raj text-slate-700">{link}</div>
+        <div className="font-display tracking-[0.2em] text-red-600">{team.teamCode}</div>
+      </div>
+      <div className="flex flex-col gap-1 flex-shrink-0">
+        <button onClick={()=>copy(link,'Link')} className="btn-ghost px-3 py-1 text-[11px]">Copy Link</button>
+        <button onClick={()=>copy(team.teamCode,'Code')} className="btn-ghost px-3 py-1 text-[11px]">Copy Code</button>
+      </div>
+    </div>
+  );
+}
+
 export default function Teams() {
   const navigate = useNavigate();
   const { state, dispatch } = useAuction();
@@ -113,6 +135,7 @@ export default function Teams() {
             {teams.map(t=>(
               <div key={t._id} className="space-y-2">
                 <TeamCard team={t}/>
+                <TeamBidLink team={t} roomCode={room.code}/>
                 <button onClick={()=>handleDelete(t._id)}
                   className="w-full py-2 text-xs text-red-400 hover:text-red-600 border border-slate-200 hover:border-red-300 rounded-xl transition-all font-raj font-semibold glass-card hover:bg-red-50">
                   🗑 Remove Team

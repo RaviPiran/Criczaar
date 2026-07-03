@@ -5,6 +5,11 @@ const teamSchema = new mongoose.Schema({
   color: { type: String, default: '#4361ee' },
   logo: { type: String, default: '' },   // base64 or URL
   room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
+  // Unique per-team code used for the team's own bidding link (/team/:roomCode).
+  // select:false so it never leaks through public/spectator team listings —
+  // only routes that explicitly .select('+teamCode') (admin reveal, code
+  // verification) can see/use it.
+  teamCode: { type: String, unique: true, sparse: true, select: false },
   budget: { type: Number, required: true, default: 100 },
   budgetLeft: { type: Number, required: true },
   slots: { type: Number, default: 11 },

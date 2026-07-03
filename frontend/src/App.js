@@ -17,6 +17,7 @@ import Results from './pages/Results';
 import { getFullRoom } from './utils/api';
 import PlayerRegister  from './pages/PlayerRegister';
 import LiveSpectator   from './pages/LiveSpectator';
+import TeamLive        from './pages/TeamLive';
 import PlayerRequests  from './pages/PlayerRequests';
 import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
@@ -93,6 +94,7 @@ function AppRoutes() {
       <Route path="/results"     element={<ProtectedRoute><Results    /></ProtectedRoute>} />
       <Route path="/register/:roomCode" element={<PlayerRegister />} />
       <Route path="/live/:roomCode"     element={<LiveSpectator />} />
+      <Route path="/team/:roomCode"     element={<TeamLive />} />
       <Route path="*"            element={<Navigate to={user ? '/tournaments' : '/login'} replace />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
     </Routes>
