@@ -114,9 +114,10 @@ export default function Players() {
             title="Download Player Logbook (landscape A4, 16 cards/page)"
             onClick={async () => {
               try {
-                const token = localStorage.getItem('ca_token');
-                const base  = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-                const res   = await fetch(`${base}/api/rooms/${room?._id}/players-pdf`, {
+                const token   = localStorage.getItem('ca_token');
+                const apiBase = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api')
+                  .replace(/\/api\/?$/, '');          // strip trailing /api if present
+                const res = await fetch(`${apiBase}/api/rooms/${room?._id}/players-pdf`, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error('PDF generation failed');
