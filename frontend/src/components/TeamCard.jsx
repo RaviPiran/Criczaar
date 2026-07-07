@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { downloadTeamCard } from '../utils/teamPoster';
 
-export default function TeamCard({ team, basePrice = 100 }) {
+export default function TeamCard({ team, basePrice = 100, onSelect }) {
   const [expanded, setExpanded] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const spent       = team.budget - team.budgetLeft;
   const pct         = Math.round((spent/team.budget)*100);
   const playerCount = team.players?.length || 0;
@@ -17,8 +20,8 @@ export default function TeamCard({ team, basePrice = 100 }) {
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/80 shadow-sm">
       <div className="h-1.5 w-full" style={{background:team.color}}/>
       <div className="p-5">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
+        {/* Header — click opens the full player popup */}
+        <div className="flex items-center gap-3 mb-4 cursor-pointer" onClick={()=>onSelect?.(team)}>
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 flex-shrink-0" style={{borderColor:team.color}}>
             {team.logo
               ? <img src={team.logo} alt={team.name} className="w-full h-full object-cover"/>
@@ -32,6 +35,21 @@ export default function TeamCard({ team, basePrice = 100 }) {
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${slotsLeft===0?'bg-red-50 text-red-600 border-red-200':'bg-gray-50 text-gray-500 border-gray-200'}`}>{slotsLeft} slots</span>
             </div>
           </div>
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (downloading) return;
+              setDownloading(true);
+              try { await downloadTeamCard(team); toast.success('Card downloaded!'); }
+              catch { toast.error('Could not generate card'); }
+              setDownloading(false);
+            }}
+            title="Download team card"
+            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border border-gray-200 hover:border-gray-300 text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            {downloading ? '⏳' : '📥'}
+          </button>
+          <span className="text-gray-300 text-lg leading-none flex-shrink-0">›</span>
         </div>
 
         {/* Budget */}

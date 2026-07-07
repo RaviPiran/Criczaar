@@ -18,7 +18,7 @@ export default function BidRules() {
   const [saving, setSaving] = useState(false);
   const upd = (k,v)=>setRules(r=>({...r,[k]:v}));
   const updBonus=(i,k,v)=>setRules(r=>{const arr=[...r.bidBonusRules];arr[i]={...arr[i],[k]:k==='label'?v:parseFloat(v)||0};return{...r,bidBonusRules:arr};});
-  const addBonus=()=>setRules(r=>({...r,bidBonusRules:[...r.bidBonusRules,{minBid:0,maxBid:0,bonusPoints:0,label:'New Range'}]}));
+  const addBonus=()=>setRules(r=>({...r,bidBonusRules:[...r.bidBonusRules,{minBid:0,maxBid:0,bonusPoints:0,bidIncrement:r.bidIncrement||10,label:'New Range'}]}));
   const removeBonus=(i)=>setRules(r=>({...r,bidBonusRules:r.bidBonusRules.filter((_,idx)=>idx!==i)}));
   const save=async()=>{
     if(!room)return toast.error('No active room');setSaving(true);
@@ -65,6 +65,9 @@ export default function BidRules() {
                   <input className="input" type="number" step="0.5" value={rule.maxBid===9999?9999:rule.maxBid} onChange={e=>updBonus(i,'maxBid',e.target.value)}/></div>
                 <div className="w-28"><label className="label">Bonus Pts</label>
                   <input className="input" type="number" value={rule.bonusPoints} onChange={e=>updBonus(i,'bonusPoints',e.target.value)}/></div>
+                <div className="w-28"><label className="label">Bid Increment</label>
+                  <input className="input" type="number" step="0.5" value={rule.bidIncrement ?? ''} placeholder={rules.bidIncrement}
+                    onChange={e=>updBonus(i,'bidIncrement',e.target.value)}/></div>
                 <button onClick={()=>removeBonus(i)} className="text-red-400 hover:text-red-600 text-xl pb-2.5 transition-colors">✕</button>
               </div>
             ))}
