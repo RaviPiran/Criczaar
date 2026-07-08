@@ -4,9 +4,11 @@ import toast from 'react-hot-toast';
 import { useAuction } from '../context/AuctionContext';
 import { getTeamsByRoom, createTeam, deleteTeam } from '../utils/api';
 import TeamCard from '../components/TeamCard';
+import PlayerCard from '../components/PlayerCard';
 import CricBg from '../components/CricBg';
+import { downloadTeamCard } from '../utils/teamPoster';
 
-const COLORS = ['#ef4444','#3b82f6','#10b981','#f59e0b','#06b6d4','#f97316','#a855f7','#f43f5e','#14b8a6','#eab308'];
+const COLORS = ['var(--primary-500)','var(--secondary-500)','#10b981','#f59e0b','#06b6d4','#f97316','#a855f7','#f43f5e','#14b8a6','#eab308'];
 function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
 
 // Shows this team's bidding link + code (only known to admin — teamCode is
@@ -31,6 +33,63 @@ function TeamBidLink({ team, roomCode }) {
   );
 }
 
+// Popup shown when a team card is clicked — squad as full player cards.
+function TeamDetailModal({ team, onClose }) {
+  if (!team) return null;
+  const spent = team.budget - team.budgetLeft;
+  const pct   = Math.round((spent/team.budget)*100);
+  const entries = team.players || [];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}>
+      <div className="glass-card rounded-3xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col"
+        onClick={e=>e.stopPropagation()}>
+        <div className="h-1.5 w-full flex-shrink-0" style={{background:team.color}}/>
+        <div className="p-5 flex items-center gap-4 border-b border-slate-200 flex-shrink-0">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0" style={{borderColor:team.color}}>
+            {team.logo
+              ? <img src={team.logo} alt={team.name} className="w-full h-full object-cover"/>
+              : <div className="w-full h-full flex items-center justify-center font-display text-2xl text-white" style={{background:team.color}}>{team.name[0]}</div>}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-display text-2xl text-slate-900 tracking-wide truncate">{team.name}</div>
+            <div className="flex flex-wrap gap-3 text-xs text-slate-500 mt-1 font-raj">
+              <span>Spent <strong style={{color:team.color}}>{Math.round(spent)} pts</strong></span>
+              <span>Left <strong className="text-slate-700">{Math.round(team.budgetLeft)} pts</strong></span>
+              <span>{pct}% used</span>
+              <span>{entries.length}/{team.slots} slots filled</span>
+            </div>
+          </div>
+          <button
+            onClick={()=>downloadTeamCard(team).then(()=>toast.success('Card downloaded!')).catch(()=>toast.error('Could not generate card'))}
+            className="btn-ghost px-3 py-2 text-xs flex-shrink-0">📥 Download Card</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-2xl leading-none flex-shrink-0 px-2">✕</button>
+        </div>
+
+        <div className="p-5 overflow-y-auto">
+          {entries.length === 0 ? (
+            <div className="text-center text-slate-400 py-16">No players bought yet</div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {entries.map((entry, i) => {
+                const p = entry.player || entry;
+                const flatPlayer = {
+                  ...p,
+                  status: entry.isRetained ? 'retained' : 'sold',
+                  soldPrice: entry.soldPrice ?? p.soldPrice,
+                  soldTo: { name: team.name, color: team.color },
+                };
+                return <PlayerCard key={p._id || i} player={flatPlayer} />;
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Teams() {
   const navigate = useNavigate();
   const { state, dispatch } = useAuction();
@@ -38,6 +97,7 @@ export default function Teams() {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm]       = useState({ name:'', budget:5000, slots:11, logo:'' });
   const [loading, setLoading] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(null);
   const logoRef = useRef();
 
   useEffect(()=>{ if(!room){navigate('/dashboard');return;} fetchTeams(); },[]);
@@ -102,7 +162,7 @@ export default function Teams() {
 
         {showAdd && (
           <div className="glass-card-red rounded-2xl p-6 space-y-4 animate-slide-up">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>Add New Team</h3>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'var(--primary-600)'}}>Add New Team</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
               <div><label className="label">Team Name *</label>
                 <input className="input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}
@@ -134,7 +194,7 @@ export default function Teams() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {teams.map(t=>(
               <div key={t._id} className="space-y-2">
-                <TeamCard team={t}/>
+                <TeamCard team={t} onSelect={setSelectedTeam}/>
                 <TeamBidLink team={t} roomCode={room.code}/>
                 <button onClick={()=>handleDelete(t._id)}
                   className="w-full py-2 text-xs text-red-400 hover:text-red-600 border border-slate-200 hover:border-red-300 rounded-xl transition-all font-raj font-semibold glass-card hover:bg-red-50">
@@ -145,6 +205,7 @@ export default function Teams() {
           </div>
         )}
       </div>
+      <TeamDetailModal team={selectedTeam} onClose={()=>setSelectedTeam(null)}/>
     </CricBg>
   );
 }
