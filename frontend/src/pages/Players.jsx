@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuction } from '../context/AuctionContext';
 import { useRehydrated } from '../App';
-import { getPlayersByRoom, createPlayer, deletePlayer } from '../utils/api';
+import { getPlayersByRoom, createPlayer, updatePlayer, deletePlayer } from '../utils/api';
 import PlayerCard from '../components/PlayerCard';
 import CricBg from '../components/CricBg';
 import PlayerProfileCard from '../components/PlayerProfileCard';
@@ -36,6 +36,7 @@ export default function Players() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [previewPlayer, setPreviewPlayer] = useState(null);
+  const [editingPlayer, setEditingPlayer] = useState(null); // original player doc being edited, or null = adding new
   const photoRef = useRef();
 
   useEffect(() => {
@@ -66,16 +67,40 @@ export default function Players() {
     setForm(frm => ({ ...frm, photo: b64 }));
   };
 
-  const handleAdd = async () => {
+  const handleEditClick = (player) => {
+    setEditingPlayer(player);
+    setForm({
+      name: player.name, club: player.club || '',
+      battingStyle: player.battingStyle || 'Right-hand Bat',
+      bowlingStyle: player.bowlingStyle || 'N/A',
+      basePrice: player.basePrice, photo: player.photo || '',
+      role: player.role || 'Batsman',
+    });
+    setShowAdd(true);
+    setPreviewPlayer(null);
+  };
+
+  const closeForm = () => {
+    setShowAdd(false);
+    setEditingPlayer(null);
+    setForm(emptyForm);
+    if (photoRef.current) photoRef.current.value = '';
+  };
+
+  const handleSave = async () => {
     if (!form.name.trim()) return toast.error('Enter player name');
     setLoading(true);
     try {
-      const { data } = await createPlayer({ ...form, room:room._id, status:'remaining', auctionOrder:players.length });
-      dispatch({ type:'UPDATE_PLAYERS', payload:[...players, data.data] });
-      setForm(emptyForm);
-      if (photoRef.current) photoRef.current.value = '';
-      setShowAdd(false);
-      toast.success('Player added!');
+      if (editingPlayer) {
+        const { data } = await updatePlayer(editingPlayer._id, { ...form });
+        dispatch({ type:'UPDATE_PLAYERS', payload: players.map(p => p._id===data.data._id ? { ...p, ...data.data } : p) });
+        toast.success('Player updated!');
+      } else {
+        const { data } = await createPlayer({ ...form, room:room._id, status:'remaining', auctionOrder:players.length });
+        dispatch({ type:'UPDATE_PLAYERS', payload:[...players, data.data] });
+        toast.success('Player added!');
+      }
+      closeForm();
     } catch(err) { toast.error(err.response?.data?.message || 'Failed'); }
     setLoading(false);
   };
@@ -135,7 +160,7 @@ export default function Players() {
             className="px-4 py-2.5 text-sm font-raj font-bold rounded-xl border border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all flex items-center gap-1.5">
             📄 Download Logbook
           </button>
-          <button className="btn-primary px-5 py-2.5 text-sm" onClick={() => setShowAdd(s => !s)}>
+          <button className="btn-primary px-5 py-2.5 text-sm" onClick={() => showAdd ? closeForm() : setShowAdd(true)}>
             {showAdd ? '✕ Close Form' : '+ Add Player'}
           </button>
         </div>
@@ -147,7 +172,7 @@ export default function Players() {
           <button key={f.k} onClick={() => setFilter(f.k)}
             className={`px-4 py-1.5 rounded-full text-sm font-raj font-semibold transition-all border`}
             style={filter===f.k
-              ? {background:'linear-gradient(135deg,#dc2626,#1d4ed8)', color:'white', border:'none', boxShadow:'0 4px 12px rgba(220,38,38,0.25)'}
+              ? {background:'linear-gradient(135deg,var(--primary-600),var(--secondary-700))', color:'white', border:'none', boxShadow:'0 4px 12px rgba(220,38,38,0.25)'}
               : {background:'white', color:'#64748b', borderColor:'#e2e8f0'}}>
             {f.l} <span className="ml-1 font-orbitron text-xs opacity-70">{counts[f.k]}</span>
           </button>
@@ -159,7 +184,7 @@ export default function Players() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up">
           <div className="bg-white rounded-2xl p-6 space-y-5 shadow-md border-2"
             style={{borderColor:'rgba(220,38,38,0.35)'}}>
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>Player Details</h3>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'var(--primary-600)'}}>{editingPlayer ? `Edit ${editingPlayer.name}` : 'Player Details'}</h3>
             <div className="space-y-4">
               <div>
                 <label className="label">Player Name *</label>
@@ -205,7 +230,7 @@ export default function Players() {
                       onClick={() => setForm(f => ({ ...f, role:r }))}
                       className="py-2 rounded-xl text-xs font-bold border transition-all"
                       style={(form.role||'Batsman')===r
-                        ? {background:'linear-gradient(135deg,#dc2626,#1d4ed8)', color:'white', borderColor:'transparent'}
+                        ? {background:'linear-gradient(135deg,var(--primary-600),var(--secondary-700))', color:'white', borderColor:'transparent'}
                         : {background:'#f8fafc', color:'#64748b', borderColor:'#e2e8f0'}}>
                       {r === 'Wicket-Keeper' ? 'WK' : r}
                     </button>
@@ -217,7 +242,7 @@ export default function Players() {
                 <div onClick={() => photoRef.current.click()}
                   className="border-2 border-dashed border-slate-300 rounded-2xl min-h-[140px]
                     flex items-center justify-center cursor-pointer transition-colors overflow-hidden bg-slate-50 relative"
-                  onMouseEnter={e=>e.currentTarget.style.borderColor='#dc2626'}
+                  onMouseEnter={e=>e.currentTarget.style.borderColor='var(--primary-600)'}
                   onMouseLeave={e=>e.currentTarget.style.borderColor='#cbd5e1'}>
                   {form.photo ? (
                     <img src={form.photo} alt="preview" className="w-full h-full object-cover" style={{maxHeight:140}}/>
@@ -237,18 +262,18 @@ export default function Players() {
               </div>
             </div>
             <div className="flex gap-3 pt-2">
-              <button className="btn-primary flex-1 py-3 text-base" onClick={handleAdd} disabled={loading}>
-                {loading ? '⏳ Adding...' : '+ Add Player'}
+              <button className="btn-primary flex-1 py-3 text-base" onClick={handleSave} disabled={loading}>
+                {loading ? '⏳ Saving...' : editingPlayer ? '💾 Save Changes' : '+ Add Player'}
               </button>
-              <button className="btn-ghost px-5 py-3" onClick={() => { setShowAdd(false); setForm(emptyForm); }}>Cancel</button>
+              <button className="btn-ghost px-5 py-3" onClick={closeForm}>Cancel</button>
             </div>
           </div>
 
           {/* PROFILE CARD PREVIEW */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{background:'#dc2626'}}/>
-              <span className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{background:'var(--primary-600)'}}/>
+              <span className="font-orbitron text-xs tracking-widest uppercase" style={{color:'var(--primary-600)'}}>
                 Live Profile Card Preview
               </span>
             </div>
@@ -290,6 +315,11 @@ export default function Players() {
               <div onClick={() => setPreviewPlayer(p)} className="cursor-pointer">
                 <PlayerCard player={p}/>
               </div>
+              <button onClick={() => handleEditClick(p)}
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity
+                  text-white rounded-lg px-2 py-1 text-xs font-bold shadow-md" style={{background:'var(--secondary-600)'}}>
+                ✏️
+              </button>
               {p.status === 'remaining' && (
                 <button onClick={() => handleDelete(p._id)}
                   className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity
@@ -308,11 +338,18 @@ export default function Players() {
           onClick={() => setPreviewPlayer(null)}>
           <div className="w-full max-w-lg animate-pop" onClick={e => e.stopPropagation()}>
             <PlayerProfileCard player={previewPlayer} size="large"/>
-            <button onClick={() => setPreviewPlayer(null)}
-              className="mt-4 w-full py-3 bg-white rounded-2xl text-slate-600 font-raj font-bold
-                text-sm border border-slate-200 hover:border-slate-400 transition-all">
-              ✕ Close
-            </button>
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => handleEditClick(previewPlayer)}
+                className="flex-1 py-3 bg-white rounded-2xl font-raj font-bold text-sm border border-slate-200 hover:border-slate-400 transition-all"
+                style={{color:'var(--secondary-700)'}}>
+                ✏️ Edit Player
+              </button>
+              <button onClick={() => setPreviewPlayer(null)}
+                className="flex-1 py-3 bg-white rounded-2xl text-slate-600 font-raj font-bold
+                  text-sm border border-slate-200 hover:border-slate-400 transition-all">
+                ✕ Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuction } from '../context/AuctionContext';
-import { getTeamsByRoom, createTeam, deleteTeam } from '../utils/api';
+import { getTeamsByRoom, createTeam, updateTeam, deleteTeam } from '../utils/api';
 import TeamCard from '../components/TeamCard';
 import PlayerCard from '../components/PlayerCard';
 import CricBg from '../components/CricBg';
@@ -98,6 +98,7 @@ export default function Teams() {
   const [form, setForm]       = useState({ name:'', budget:5000, slots:11, logo:'' });
   const [loading, setLoading] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [editingTeam, setEditingTeam] = useState(null); // the original team doc being edited, or null = adding new
   const logoRef = useRef();
 
   useEffect(()=>{ if(!room){navigate('/dashboard');return;} fetchTeams(); },[]);
@@ -111,15 +112,38 @@ export default function Teams() {
     const b64 = await toBase64(f);
     setForm(frm=>({...frm,logo:b64}));
   };
-  const handleAdd = async () => {
+  const handleEditClick = (team) => {
+    setEditingTeam(team);
+    setForm({ name: team.name, budget: team.budget, slots: team.slots, logo: team.logo || '' });
+    setShowAdd(true);
+  };
+  const closeForm = () => {
+    setShowAdd(false);
+    setEditingTeam(null);
+    setForm({ name:'', budget:5000, slots:11, logo:'' });
+    if (logoRef.current) logoRef.current.value = '';
+  };
+  const handleSave = async () => {
     if(!form.name.trim()) return toast.error('Enter team name');
     setLoading(true);
     try {
-      const color=COLORS[teams.length%COLORS.length];
-      const{data}=await createTeam({...form,color,budgetLeft:form.budget,room:room._id,players:[],retainedPlayers:[]});
-      dispatch({type:'UPDATE_TEAMS',payload:[...teams,data.data]});
-      setForm({name:'',budget:5000,slots:11,logo:''}); if(logoRef.current)logoRef.current.value='';
-      setShowAdd(false); toast.success('Team added!');
+      if (editingTeam) {
+        // Keep "spent so far" consistent when the budget is changed —
+        // shift budgetLeft by the same delta instead of overwriting it.
+        const delta = form.budget - editingTeam.budget;
+        const { data } = await updateTeam(editingTeam._id, {
+          name: form.name, budget: form.budget, slots: form.slots, logo: form.logo,
+          budgetLeft: Math.max(0, (editingTeam.budgetLeft ?? form.budget) + delta),
+        });
+        dispatch({ type:'UPDATE_TEAMS', payload: teams.map(t => t._id===data.data._id ? { ...t, ...data.data } : t) });
+        toast.success('Team updated!');
+      } else {
+        const color=COLORS[teams.length%COLORS.length];
+        const{data}=await createTeam({...form,color,budgetLeft:form.budget,room:room._id,players:[],retainedPlayers:[]});
+        dispatch({type:'UPDATE_TEAMS',payload:[...teams,data.data]});
+        toast.success('Team added!');
+      }
+      closeForm();
     } catch(err){toast.error(err.response?.data?.message||'Failed');}
     setLoading(false);
   };
@@ -140,7 +164,7 @@ export default function Teams() {
             <h2 className="font-display text-3xl text-slate-900 tracking-wide">🛡 Teams</h2>
             <p className="text-slate-500 text-sm mt-1">{teams.length} teams registered</p>
           </div>
-          <button className="btn-primary px-5 py-2.5 text-sm" onClick={()=>setShowAdd(s=>!s)}>
+          <button className="btn-primary px-5 py-2.5 text-sm" onClick={()=> showAdd ? closeForm() : setShowAdd(true)}>
             {showAdd ? '✕ Cancel' : '+ Add Team'}
           </button>
         </div>
@@ -162,11 +186,11 @@ export default function Teams() {
 
         {showAdd && (
           <div className="glass-card-red rounded-2xl p-6 space-y-4 animate-slide-up">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'var(--primary-600)'}}>Add New Team</h3>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'var(--primary-600)'}}>{editingTeam ? `Edit ${editingTeam.name}` : 'Add New Team'}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
               <div><label className="label">Team Name *</label>
                 <input className="input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}
-                  placeholder="e.g. Mumbai Indians" onKeyDown={e=>e.key==='Enter'&&handleAdd()}/></div>
+                  placeholder="e.g. Mumbai Indians" onKeyDown={e=>e.key==='Enter'&&handleSave()}/></div>
               <div><label className="label">Budget (pts)</label>
                 <input className="input" type="number" value={form.budget} min="100" onChange={e=>setForm(f=>({...f,budget:+e.target.value}))}/></div>
               <div><label className="label">Player Slots</label>
@@ -179,8 +203,10 @@ export default function Teams() {
                 <input type="file" accept="image/*" ref={logoRef} className="hidden" onChange={handleLogo}/></div>
             </div>
             <div className="flex gap-3">
-              <button className="btn-primary px-6 py-2.5" onClick={handleAdd} disabled={loading}>{loading?'⏳ Adding...':'+ Add Team'}</button>
-              <button className="btn-ghost px-6 py-2.5" onClick={()=>setShowAdd(false)}>Cancel</button>
+              <button className="btn-primary px-6 py-2.5" onClick={handleSave} disabled={loading}>
+                {loading ? '⏳ Saving...' : editingTeam ? '💾 Save Changes' : '+ Add Team'}
+              </button>
+              <button className="btn-ghost px-6 py-2.5" onClick={closeForm}>Cancel</button>
             </div>
           </div>
         )}
@@ -196,10 +222,16 @@ export default function Teams() {
               <div key={t._id} className="space-y-2">
                 <TeamCard team={t} onSelect={setSelectedTeam}/>
                 <TeamBidLink team={t} roomCode={room.code}/>
-                <button onClick={()=>handleDelete(t._id)}
-                  className="w-full py-2 text-xs text-red-400 hover:text-red-600 border border-slate-200 hover:border-red-300 rounded-xl transition-all font-raj font-semibold glass-card hover:bg-red-50">
-                  🗑 Remove Team
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={()=>handleEditClick(t)}
+                    className="flex-1 py-2 text-xs text-slate-500 hover:text-slate-800 border border-slate-200 hover:border-slate-300 rounded-xl transition-all font-raj font-semibold glass-card">
+                    ✏️ Edit
+                  </button>
+                  <button onClick={()=>handleDelete(t._id)}
+                    className="flex-1 py-2 text-xs text-red-400 hover:text-red-600 border border-slate-200 hover:border-red-300 rounded-xl transition-all font-raj font-semibold glass-card hover:bg-red-50">
+                    🗑 Remove
+                  </button>
+                </div>
               </div>
             ))}
           </div>
