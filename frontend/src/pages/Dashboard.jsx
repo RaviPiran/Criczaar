@@ -8,11 +8,11 @@ import ShareLiveLink from '../components/ShareLiveLink';
 
 const QuickCard = ({ icon, title, desc, action, onClick, accent='red' }) => {
   const styles = {
-    red:     { border:'rgba(220,38,38,0.28)',  text:'#dc2626' },
-    blue:    { border:'rgba(29,78,216,0.28)',   text:'#1d4ed8' },
+    red:     { border:'rgba(245,158,11,0.28)',  text:'#F59E0B' },
+    blue:    { border:'rgba(99,102,241,0.28)',   text:'#6366F1' },
     emerald: { border:'rgba(5,150,105,0.28)',   text:'#059669' },
-    violet:  { border:'rgba(109,40,217,0.28)',  text:'#7c3aed' },
-    cyan:    { border:'rgba(8,145,178,0.28)',   text:'#0891b2' },
+    violet:  { border:'rgba(99,102,241,0.28)',  text:'#6366F1' },
+    cyan:    { border:'rgba(8,145,178,0.28)',   text:'#38BDF8' },
   };
   const s = styles[accent] || styles.red;
   return (
@@ -99,7 +99,7 @@ export default function Dashboard() {
 
         {/* Tournament + Welcome banner */}
         <div className="rounded-3xl p-6 text-white shadow-lg relative overflow-hidden"
-          style={{background:'linear-gradient(135deg,#dc2626 0%,#1e1b4b 50%,#1d4ed8 100%)'}}>
+          style={{background:'linear-gradient(135deg,#D97706 0%,#121829 52%,#6366F1 100%)'}}>
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full opacity-20"
               style={{background:'radial-gradient(circle,white 0%,transparent 70%)'}}/>
@@ -144,7 +144,7 @@ export default function Dashboard() {
               ['Unsold',    unsold,                       'text-red-600',    'glass-card-red'],
               ['Retained',  retained,                     'text-blue-700',   'glass-card'],
               ['Remaining', remain,                       'text-slate-600',  'glass-card'],
-              ['Spent',     `${Math.round(totalSpent)} pts`,'text-red-700','glass-card-red'],
+              ['Spent',     `${Math.round(totalSpent)} pts`,'text-amber-700','glass-card-red'],
             ].map(([l,v,c,cls]) => (
               <div key={l} className={`${cls} rounded-2xl p-4 text-center`}>
                 <div className={`font-orbitron text-xl font-bold ${c}`}>{v}</div>
@@ -190,7 +190,7 @@ export default function Dashboard() {
                   const switching = loadingSwitch === r._id;
                   return (
                     <div key={r._id}
-                      className={`glass-card rounded-2xl p-4 border-2 transition-all ${isActive ? 'border-red-400 shadow-md' : 'border-transparent hover:border-slate-300'}`}>
+                      className={`glass-card rounded-2xl p-4 border-2 transition-all ${isActive ? 'border-amber-400 shadow-md' : 'border-transparent hover:border-slate-300'}`}>
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex-1 min-w-0">
                           <div className="font-display text-base text-slate-800 truncate">{r.name}</div>
@@ -203,7 +203,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex gap-2">
                         {isActive ? (
-                          <span className="flex-1 text-center text-xs font-bold text-red-600 py-1.5 bg-red-50 rounded-lg border border-red-200">
+                          <span className="flex-1 text-center text-xs font-bold text-amber-600 py-1.5 bg-amber-50 rounded-lg border border-amber-200">
                             ● Current Auction
                           </span>
                         ) : (
@@ -211,7 +211,7 @@ export default function Dashboard() {
                             onClick={() => handleSwitchRoom(r._id)}
                             disabled={switching}
                             className="flex-1 text-xs font-bold py-1.5 rounded-lg border transition-all hover:-translate-y-0.5 disabled:opacity-40"
-                            style={{borderColor:'#1d4ed8', color:'#1d4ed8', background:'rgba(29,78,216,0.05)'}}>
+                            style={{borderColor:'#6366F1', color:'#818CF8', background:'rgba(99,102,241,0.05)'}}>
                             {switching ? '⏳ Loading...' : '↩ Switch to this'}
                           </button>
                         )}

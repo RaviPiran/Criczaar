@@ -109,7 +109,7 @@ export default function PlayerRegister() {
   // ── Loading state ──────────────────────────────────────────────────────────
   if (checking) return (
     <div className="min-h-screen flex items-center justify-center"
-      style={{ background: 'linear-gradient(135deg,#0f172a,#1e1b4b)' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D,#121829)' }}>
       <div className="text-center">
         <div className="text-5xl animate-bounce mb-4">🏏</div>
         <p className="text-white/50 font-raj tracking-widest text-sm">Loading auction...</p>
@@ -120,7 +120,7 @@ export default function PlayerRegister() {
   // ── Room not found ─────────────────────────────────────────────────────────
   if (roomErr) return (
     <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg,#0f172a,#1e1b4b)' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D,#121829)' }}>
       <div className="text-center space-y-4">
         <div className="text-6xl">❌</div>
         <h2 className="text-white font-display text-2xl">Invalid Link</h2>
@@ -133,7 +133,7 @@ export default function PlayerRegister() {
   // ── Success screen ─────────────────────────────────────────────────────────
   if (submitted) return (
     <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg,#0f172a,#1e1b4b)' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D,#121829)' }}>
       <div className="text-center space-y-5 max-w-sm">
         <div className="text-7xl animate-bounce">🎉</div>
         <h2 className="text-white font-display text-3xl tracking-wide">Registered!</h2>
@@ -164,7 +164,7 @@ export default function PlayerRegister() {
             onClick={resetForm}
             className="w-full py-3 rounded-2xl font-display tracking-wide text-white transition-all hover:-translate-y-0.5"
             style={{
-              background: 'linear-gradient(135deg,#1d4ed8,#2563eb)',
+              background: 'linear-gradient(135deg,#6366F1,#4F46E5)',
             }}
           >
             ➕ Register Another Player
@@ -187,7 +187,7 @@ export default function PlayerRegister() {
   // ── Registration Form ──────────────────────────────────────────────────────
   return (
     <div className="min-h-screen py-8 px-4"
-      style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%)' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D 0%,#121829 60%,#0A0F1D 100%)' }}>
       <Toaster position="top-center" />
 
       <div className="max-w-lg mx-auto space-y-6">
@@ -196,18 +196,18 @@ export default function PlayerRegister() {
         <div className="text-center space-y-2 pt-4">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#dc2626,#1d4ed8)' }}>
+              style={{ background: 'linear-gradient(135deg,#FBBF24,#F59E0B)' }}>
               <span className="text-white font-display text-xl">C</span>
             </div>
             <div className="text-left">
               <div className="font-display text-2xl text-white leading-none">
-                CRIC<span className="text-red-500">ZAAR</span>
+                CRIC<span className="text-amber-500">ZAAR</span>
               </div>
               <div className="text-xs text-white/30 font-raj tracking-widest">AUCTION PLATFORM</div>
             </div>
           </div>
           <h1 className="font-display text-3xl text-white tracking-wide">
-            Player <span className="text-red-500">Registration</span>
+            Player <span className="text-amber-500">Registration</span>
           </h1>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10"
             style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -225,7 +225,7 @@ export default function PlayerRegister() {
           <div className="flex flex-col items-center gap-3">
             <div
               onClick={() => document.getElementById('photo-input').click()}
-              className="w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-red-400/60 transition-all"
+              className="w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-amber-400/60 transition-all"
               style={{ background: 'rgba(255,255,255,0.04)' }}>
               {photoPreview
                 ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
@@ -242,7 +242,7 @@ export default function PlayerRegister() {
           {/* Name */}
           <div>
             <label className="block text-xs text-white/40 font-orbitron uppercase tracking-widest mb-1.5">
-              Full Name <span className="text-red-500">*</span>
+              Full Name <span className="text-amber-500">*</span>
             </label>
             <input
               value={form.name} onChange={e => set('name', e.target.value)}
@@ -255,17 +255,17 @@ export default function PlayerRegister() {
           {/* Role */}
           <div>
             <label className="block text-xs text-white/40 font-orbitron uppercase tracking-widest mb-1.5">
-              Playing Role <span className="text-red-500">*</span>
+              Playing Role <span className="text-amber-500">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               {ROLES.map(r => (
                 <button key={r} type="button"
                   onClick={() => set('role', r)}
                   className={`py-2.5 rounded-xl text-sm font-raj font-semibold transition-all border ${form.role === r
-                      ? 'border-red-500 text-white'
+                      ? 'border-amber-500 text-ink-950'
                       : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
                     }`}
-                  style={form.role === r ? { background: 'linear-gradient(135deg,#dc2626,#1d4ed8)' } : { background: 'rgba(255,255,255,0.03)' }}>
+                  style={form.role === r ? { background: 'linear-gradient(135deg,#FBBF24,#F59E0B)' } : { background: 'rgba(255,255,255,0.03)' }}>
                   {r === 'Batsman' ? '🏏' : r === 'Bowler' ? '⚾' : r === 'All-rounder' ? '⭐' : '🧤'} {r}
                 </button>
               ))}
@@ -283,7 +283,7 @@ export default function PlayerRegister() {
                       ? 'border-blue-500 text-white'
                       : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
                     }`}
-                  style={form.battingStyle === s ? { background: 'rgba(29,78,216,0.3)' } : { background: 'rgba(255,255,255,0.03)' }}>
+                  style={form.battingStyle === s ? { background: 'rgba(99,102,241,0.3)' } : { background: 'rgba(255,255,255,0.03)' }}>
                   {s}
                 </button>
               ))}
@@ -297,8 +297,8 @@ export default function PlayerRegister() {
               value={form.bowlingStyle} onChange={e => set('bowlingStyle', e.target.value)}
               className="w-full rounded-xl px-4 py-3 text-white font-raj text-sm border border-white/10 bg-white/5 focus:outline-none focus:border-blue-400/60 transition-all"
               style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <option value="" style={{ background: '#1e1b4b' }}>-- Select --</option>
-              {BOWL_STYLE.map(s => <option key={s} value={s} style={{ background: '#1e1b4b' }}>{s}</option>)}
+              <option value="" style={{ background: '#121829' }}>-- Select --</option>
+              {BOWL_STYLE.map(s => <option key={s} value={s} style={{ background: '#121829' }}>{s}</option>)}
             </select>
           </div>
 
@@ -335,8 +335,8 @@ export default function PlayerRegister() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full py-4 rounded-2xl font-display tracking-widest text-white text-lg font-bold transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg mt-2"
-            style={{ background: loading ? '#374151' : 'linear-gradient(135deg,#dc2626,#1d4ed8)' }}>
+            className="w-full py-4 rounded-2xl font-display tracking-widest text-ink-950 text-lg font-bold transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg mt-2"
+            style={{ background: loading ? '#374151' : 'linear-gradient(135deg,#FBBF24,#F59E0B)' }}>
             {loading ? '⏳ Submitting...' : '🏏 Register for Auction'}
           </button>
 

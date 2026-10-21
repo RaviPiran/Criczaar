@@ -24,16 +24,20 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-      style={{background:'linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#1e3a8a 100%)'}}>
+      style={{background:'radial-gradient(900px 500px at 15% 0%,rgba(245,158,11,0.10),transparent 60%),radial-gradient(900px 600px at 100% 100%,rgba(99,102,241,0.16),transparent 60%),#0A0F1D'}}>
 
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Red glow top-right */}
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-20"
-          style={{background:'radial-gradient(circle,#dc2626 0%,transparent 70%)'}}/>
-        {/* Blue glow bottom-left */}
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full opacity-20"
-          style={{background:'radial-gradient(circle,#1d4ed8 0%,transparent 70%)'}}/>
+        {/* Amber glow top-right */}
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-25 animate-drift"
+          style={{background:'radial-gradient(circle,#F59E0B 0%,transparent 70%)'}}/>
+        {/* Indigo glow bottom-left */}
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full opacity-25 animate-drift"
+          style={{background:'radial-gradient(circle,#6366F1 0%,transparent 70%)', animationDelay:'-8s'}}/>
+        {/* Sky glow centre-right */}
+        <div className="absolute top-1/3 right-1/4 w-72 h-72 rounded-full opacity-15 animate-drift"
+          style={{background:'radial-gradient(circle,#38BDF8 0%,transparent 70%)', animationDelay:'-13s'}}/>
+        <div className="absolute inset-0 dot-grid opacity-60"/>
         {/* Cricket pitch lines */}
         <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 1000 600">
           <ellipse cx="500" cy="300" rx="420" ry="260" fill="none" stroke="#ffffff" strokeWidth="1.5"/>
@@ -43,36 +47,36 @@ export default function Login() {
         </svg>
         {/* Diagonal accent lines */}
         <div className="absolute top-0 left-0 w-full h-1"
-          style={{background:'linear-gradient(90deg,#dc2626,#1d4ed8)'}}/>
+          style={{background:'linear-gradient(90deg,#F59E0B,#38BDF8,#6366F1)',backgroundSize:'200% 100%',animation:'gradientShift 6s ease infinite'}}/>
       </div>
 
       <div className="w-full max-w-md animate-slide-up relative z-10">
 
         {/* Logo block */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl mb-4 overflow-hidden border border-white/20"
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl mb-4 overflow-hidden border border-white/20 animate-float"
             style={{background:'rgba(255,255,255,0.08)',backdropFilter:'blur(12px)'}}>
             <img src={icon} alt="icon" className="w-20 h-20 object-contain"/>
           </div>
           <h1 className="font-display text-6xl leading-none text-white">CRIC</h1>
-          <h1 className="font-display text-6xl leading-none text-red-500">ZAAR</h1>
-          <p className="text-white/40 text-sm tracking-[4px] uppercase mt-2 font-raj">Live • Bidding • Championship</p>
+          <h1 className="font-display text-6xl leading-none text-gradient">ZAAR</h1>
+          <p className="text-white/40 text-xs tracking-[4px] uppercase mt-2 font-mono">Live • Bidding • Championship</p>
         </div>
 
         {/* Card */}
         <div className="rounded-3xl shadow-2xl p-6 border border-white/10"
-          style={{background:'rgba(255,255,255,0.07)',backdropFilter:'blur(20px)'}}>
+          style={{background:'rgba(18,24,41,0.72)',backdropFilter:'blur(20px)',boxShadow:'0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(245,158,11,0.06)'}}>
 
           {/* Tabs */}
           <div className="flex rounded-2xl p-1 mb-7 gap-1 border border-white/10"
-            style={{background:'rgba(0,0,0,0.25)'}}>
+            style={{background:'rgba(10,15,29,0.7)'}}>
             {['login','register'].map(t=>(
               <button key={t} onClick={()=>setTab(t)}
-                className={`flex-1 py-2.5 rounded-xl font-raj font-bold text-sm tracking-widest uppercase transition-all duration-200
+                className={`flex-1 py-2.5 rounded-xl font-mono font-bold text-xs tracking-widest uppercase transition-all duration-200
                   ${tab===t
-                    ? 'text-white shadow-lg'
+                    ? 'text-ink-950 shadow-lg'
                     : 'text-white/40 hover:text-white/70'}`}
-                style={tab===t ? {background:'linear-gradient(135deg,#dc2626 0%,#1d4ed8 100%)'} : {}}>
+                style={tab===t ? {background:'linear-gradient(135deg,#FBBF24 0%,#F59E0B 100%)'} : {}}>
                 {t==='login' ? '🔑 Sign In' : '📝 Register'}
               </button>
             ))}
@@ -82,30 +86,29 @@ export default function Login() {
             {tab==='register' && (
               <div className="animate-fade-in">
                 <label className="label text-white/60">Full Name</label>
-                <input className="input bg-white/10 border-white/20 text-white placeholder-white/30 focus:border-red-500 focus:bg-white/15"
+                <input className="input bg-white/10 border-white/20 text-white placeholder-white/30 focus:border-amber-500 focus:bg-white/15"
                   type="text" placeholder="Your full name" value={form.name} onChange={e=>set('name',e.target.value)} required/>
               </div>
             )}
             <div>
               <label className="label text-white/60">Email Address</label>
-              <input className="input bg-white/10 border-white/20 text-white placeholder-white/30 focus:border-red-500 focus:bg-white/15"
+              <input className="input bg-white/10 border-white/20 text-white placeholder-white/30 focus:border-amber-500 focus:bg-white/15"
                 type="email" placeholder="you@example.com" value={form.email} onChange={e=>set('email',e.target.value)} required/>
             </div>
             <div>
               <label className="label text-white/60">Password</label>
-              <input className="input bg-white/10 border-white/20 text-white placeholder-white/30 focus:border-red-500 focus:bg-white/15"
+              <input className="input bg-white/10 border-white/20 text-white placeholder-white/30 focus:border-amber-500 focus:bg-white/15"
                 type="password" placeholder={tab==='register'?'Min 6 characters':'••••••••'} value={form.password} onChange={e=>set('password',e.target.value)} required minLength={6}/>
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-3.5 text-base font-display tracking-widest text-lg mt-2 rounded-xl text-white font-bold transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{background:'linear-gradient(135deg,#dc2626 0%,#1d4ed8 100%)'}}>
+              className="btn-primary w-full py-3.5 font-display tracking-widest text-lg mt-2 rounded-xl">
               {loading ? '⏳ Please wait...' : tab==='login' ? '🚀 SIGN IN' : '🎉 CREATE ACCOUNT'}
             </button>
           </form>
 
           <div className="mt-6 p-3 rounded-xl text-center border border-white/10"
-            style={{background:'rgba(220,38,38,0.1)'}}>
-            <p className="text-xs text-white/50 font-raj">First time? Register to host your own live auction room.</p>
+            style={{background:'rgba(245,158,11,0.08)'}}>
+            <p className="text-xs text-white/50">First time? Register to host your own live auction room.</p>
           </div>
         </div>
 

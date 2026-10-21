@@ -172,8 +172,8 @@ export default function Players() {
           <button key={f.k} onClick={() => setFilter(f.k)}
             className={`px-4 py-1.5 rounded-full text-sm font-raj font-semibold transition-all border`}
             style={filter===f.k
-              ? {background:'linear-gradient(135deg,var(--primary-600),var(--secondary-700))', color:'white', border:'none', boxShadow:'0 4px 12px rgba(220,38,38,0.25)'}
-              : {background:'white', color:'#64748b', borderColor:'#e2e8f0'}}>
+              ? {background:'linear-gradient(135deg,#FBBF24,#F59E0B)', color:'#0A0F1D', border:'none', boxShadow:'0 4px 12px rgba(245,158,11,0.25)'}
+              : {background:'#121829', color:'#8591B0', borderColor:'#222B45'}}>
             {f.l} <span className="ml-1 font-orbitron text-xs opacity-70">{counts[f.k]}</span>
           </button>
         ))}
@@ -183,7 +183,7 @@ export default function Players() {
       {showAdd && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up">
           <div className="bg-white rounded-2xl p-6 space-y-5 shadow-md border-2"
-            style={{borderColor:'rgba(220,38,38,0.35)'}}>
+            style={{borderColor:'rgba(245,158,11,0.35)'}}>
             <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'var(--primary-600)'}}>{editingPlayer ? `Edit ${editingPlayer.name}` : 'Player Details'}</h3>
             <div className="space-y-4">
               <div>
@@ -230,8 +230,8 @@ export default function Players() {
                       onClick={() => setForm(f => ({ ...f, role:r }))}
                       className="py-2 rounded-xl text-xs font-bold border transition-all"
                       style={(form.role||'Batsman')===r
-                        ? {background:'linear-gradient(135deg,var(--primary-600),var(--secondary-700))', color:'white', borderColor:'transparent'}
-                        : {background:'#f8fafc', color:'#64748b', borderColor:'#e2e8f0'}}>
+                        ? {background:'linear-gradient(135deg,#FBBF24,#F59E0B)', color:'#0A0F1D', borderColor:'transparent'}
+                        : {background:'#0F1629', color:'#8591B0', borderColor:'#222B45'}}>
                       {r === 'Wicket-Keeper' ? 'WK' : r}
                     </button>
                   ))}
@@ -323,7 +323,7 @@ export default function Players() {
               {p.status === 'remaining' && (
                 <button onClick={() => handleDelete(p._id)}
                   className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity
-                    bg-red-600 text-white rounded-lg px-2 py-1 text-xs font-bold shadow-md">
+                    bg-amber-500 text-ink-950 rounded-lg px-2 py-1 text-xs font-bold shadow-md">
                   🗑
                 </button>
               )}

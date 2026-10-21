@@ -48,7 +48,7 @@ export default function SoldBurst({ result, onClose }) {
 }
 
 function spawnConfetti() {
-  const colors=['#f59e0b','#ef4444','#10b981','#3b82f6','#06b6d4','#8b5cf6'];
+  const colors=['#F59E0B','#FBBF24','#10B981','#6366F1','#38BDF8','#A78BFA'];
   for(let i=0;i<60;i++){
     const el=document.createElement('div');
     const size=Math.random()*10+5;

@@ -56,14 +56,14 @@ export default function PlayerCard({ player, onClick, compact=false }) {
         {!compact && (
           <div className="flex flex-wrap gap-1 justify-center">
             {player.battingStyle && <span className="text-[10px] bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full">{player.battingStyle}</span>}
-            {player.bowlingStyle && player.bowlingStyle!=='N/A' && <span className="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">{player.bowlingStyle}</span>}
+            {player.bowlingStyle && player.bowlingStyle!=='N/A' && <span className="text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full">{player.bowlingStyle}</span>}
           </div>
         )}
 
         <div className="text-xs text-gray-400">Base: <span className="font-orbitron text-amber-600 text-xs">{player.basePrice} pts</span></div>
 
         {(isSold||isRetained) && player.soldTo && (
-          <div className="text-xs font-bold truncate max-w-full" style={{color:player.soldTo?.color||(isRetained?'#0891b2':'#059669')}}>
+          <div className="text-xs font-bold truncate max-w-full" style={{color:player.soldTo?.color||(isRetained?'#38BDF8':'#059669')}}>
             {isRetained?'🔒':'→'} {player.soldTo?.name}{player.soldPrice?` @ ${Math.round(player.soldPrice)} pts`:''}
           </div>
         )}

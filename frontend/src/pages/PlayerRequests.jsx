@@ -207,22 +207,22 @@ export default function PlayerRequests() {
         </div> */}
 
         {/* Player Registration Link — share this with players */}
-        <div className="glass-card rounded-2xl p-5 space-y-3 border-2" style={{borderColor:'rgba(220,38,38,0.25)', background:'rgba(220,38,38,0.03)'}}>
+        <div className="glass-card rounded-2xl p-5 space-y-3 border-2" style={{borderColor:'rgba(245,158,11,0.25)', background:'rgba(245,158,11,0.03)'}}>
           <div className="flex items-center gap-2">
             <span className="text-lg">🏏</span>
-            <h3 className="font-orbitron text-xs uppercase tracking-widest text-red-600">
+            <h3 className="font-orbitron text-xs uppercase tracking-widest text-amber-600">
               Player Registration Link — Share this with players
             </h3>
           </div>
           <p className="text-xs text-slate-500">Players open this link, fill their details, and their registration appears in the Pending tab below.</p>
           <div className="flex items-center gap-3 flex-wrap">
-            <code className="flex-1 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 text-sm text-red-700 font-mono break-all select-all font-semibold">
+            <code className="flex-1 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-sm text-amber-700 font-mono break-all select-all font-semibold">
               {registrationUrl}
             </code>
             <div className="flex gap-2 flex-shrink-0">
               <button
                 onClick={() => { navigator.clipboard.writeText(registrationUrl); toast.success('Link copied!'); }}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold border border-red-300 text-red-600 hover:bg-red-50 transition-all whitespace-nowrap">
+                className="px-4 py-2.5 rounded-xl text-xs font-bold border border-amber-300 text-amber-600 hover:bg-amber-50 transition-all whitespace-nowrap">
                 📋 Copy Link
               </button>
               <a
@@ -306,7 +306,7 @@ export default function PlayerRequests() {
                       {bulkActioning ? '⏳' : '✅'} Approve {selected.size}
                     </button>
                     <button onClick={handleBulkReject} disabled={bulkActioning}
-                      className="px-4 py-1.5 text-xs font-bold rounded-lg border border-red-300 text-red-500 hover:bg-red-50 transition-all disabled:opacity-40 flex items-center gap-1.5">
+                      className="px-4 py-1.5 text-xs font-bold rounded-lg border border-amber-300 text-amber-500 hover:bg-amber-50 transition-all disabled:opacity-40 flex items-center gap-1.5">
                       {bulkActioning ? '⏳' : '❌'} Reject {selected.size}
                     </button>
                     <button onClick={() => setSelected(new Set())}
@@ -333,7 +333,7 @@ export default function PlayerRequests() {
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-slate-200 flex-shrink-0">
                     {req.photo
                       ? <img src={req.photo} alt={req.name} className="w-full h-full object-cover"/>
-                      : <div className="w-full h-full bg-gradient-to-br from-blue-100 to-red-100 flex items-center justify-center font-display text-2xl text-blue-600">
+                      : <div className="w-full h-full bg-gradient-to-br from-blue-100 to-amber-100 flex items-center justify-center font-display text-2xl text-blue-600">
                           {req.name[0]}
                         </div>}
                   </div>
@@ -382,7 +382,7 @@ export default function PlayerRequests() {
                       <button
                         onClick={() => { setRejectId(req._id); setRejectMsg(''); }}
                         disabled={actioning === req._id}
-                        className="px-4 py-2 text-xs font-bold rounded-xl border border-red-300 text-red-500 hover:bg-red-50 transition-all disabled:opacity-40">
+                        className="px-4 py-2 text-xs font-bold rounded-xl border border-amber-300 text-amber-500 hover:bg-amber-50 transition-all disabled:opacity-40">
                         ❌ Reject
                       </button>
                     </>
@@ -397,7 +397,7 @@ export default function PlayerRequests() {
                   )}
                   <button
                     onClick={() => handleDelete(req._id)}
-                    className="px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-400 hover:border-red-300 hover:text-red-400 transition-all">
+                    className="px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-400 hover:border-amber-300 hover:text-amber-400 transition-all">
                     🗑
                   </button>
                 </div>
@@ -462,7 +462,7 @@ export default function PlayerRequests() {
                 <button
                   onClick={handleReject}
                   disabled={actioning === rejectId}
-                  className="flex-1 py-3 rounded-xl font-bold text-white text-sm bg-red-500 hover:bg-red-600 transition-all disabled:opacity-40">
+                  className="flex-1 py-3 rounded-xl font-bold text-ink-950 text-sm bg-amber-500 hover:bg-amber-500 transition-all disabled:opacity-40">
                   {actioning === rejectId ? '⏳...' : '❌ Confirm Reject'}
                 </button>
                 <button

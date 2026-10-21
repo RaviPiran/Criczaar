@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { createRoom, createTeam, createPlayer, updateRoomStatus, retainPlayerAPI } from '../utils/api';
 import { useAuction } from '../context/AuctionContext';
 
-const COLORS  = ['#ef4444','#3b82f6','#10b981','#f59e0b','#06b6d4','#f97316','#a855f7','#f43f5e','#14b8a6','#eab308'];
+const COLORS  = ['#ef4444','#6366F1','#10b981','#f59e0b','#38BDF8','#f97316','#a855f7','#f43f5e','#14b8a6','#FBBF24'];
 const BATTING = ['Right-hand Bat','Left-hand Bat'];
 const BOWLING = ['Right-arm Fast','Right-arm Medium','Right-arm Off-spin','Right-arm Leg-spin',
                  'Left-arm Fast','Left-arm Medium','Left-arm Orthodox','Left-arm Wrist-spin','N/A'];
@@ -141,7 +141,7 @@ export default function Setup() {
 
   /* ── active card style ── */
   const cardStyle = {
-    background:'rgba(255,255,255,0.82)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', border:'1.5px solid rgba(220,38,38,0.22)', borderRadius:20, padding:24,
+    background:'rgba(18,24,41,0.82)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', border:'1.5px solid rgba(245,158,11,0.22)', borderRadius:20, padding:24,
   };
 
   return (
@@ -157,7 +157,7 @@ export default function Setup() {
           <button key={m} onClick={()=>setMode(m)}
             className="px-6 py-2 rounded-xl font-raj font-bold text-sm tracking-widest uppercase transition-all"
             style={mode===m
-              ? {background:'linear-gradient(135deg,#dc2626,#1d4ed8)', color:'white', boxShadow:'0 4px 12px rgba(220,38,38,0.3)'}
+              ? {background:'linear-gradient(135deg,#FBBF24,#F59E0B)', color:'#0A0F1D', boxShadow:'0 4px 12px rgba(245,158,11,0.3)'}
               : {color:'#94a3b8'}}>
             {m==='create'?'🏟 Create':'🔗 Join'}
           </button>
@@ -174,8 +174,8 @@ export default function Setup() {
               onChange={e=>setJoinCode(e.target.value.toUpperCase())}
               placeholder="e.g. IPL2025" maxLength={8}/>
           </div>
-          <button className="w-full py-3 rounded-xl text-white font-display tracking-widest font-bold transition-all hover:-translate-y-0.5 disabled:opacity-40"
-            style={{background:'linear-gradient(135deg,#dc2626,#1d4ed8)'}}
+          <button className="w-full py-3 rounded-xl text-ink-950 font-display tracking-widest font-bold transition-all hover:-translate-y-0.5 disabled:opacity-40"
+            style={{background:'linear-gradient(135deg,#FBBF24,#F59E0B)'}}
             onClick={joinRoom} disabled={loading}>
             {loading?'⏳ Joining...':'🔗 Join Room'}
           </button>
@@ -192,16 +192,16 @@ export default function Setup() {
               <button onClick={()=>setStep(i)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap text-sm font-raj font-bold border"
                 style={step===i
-                  ? {background:'linear-gradient(135deg,#dc2626,#1d4ed8)', color:'white', border:'none', boxShadow:'0 4px 12px rgba(220,38,38,0.25)'}
+                  ? {background:'linear-gradient(135deg,#FBBF24,#F59E0B)', color:'#0A0F1D', border:'none', boxShadow:'0 4px 12px rgba(245,158,11,0.25)'}
                   : i<step
                   ? {background:'rgba(5,150,105,0.08)', color:'#059669', borderColor:'rgba(5,150,105,0.3)'}
-                  : {background:'white', color:'#94a3b8', borderColor:'#e2e8f0'}}>
+                  : {background:'#121829', color:'#94a3b8', borderColor:'#222B45'}}>
                 <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={step===i
                     ? {background:'rgba(255,255,255,0.25)', color:'white'}
                     : i<step
                     ? {background:'#059669', color:'white'}
-                    : {background:'#e2e8f0', color:'#94a3b8'}}>
+                    : {background:'#222B45', color:'#94a3b8'}}>
                   {i<step ? '✓' : i+1}
                 </span>
                 <span>{STEP_ICONS[i]} {s}</span>
@@ -224,7 +224,7 @@ export default function Setup() {
                 </div>
               </div>
             )}
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>Room Configuration</h3>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#F59E0B'}}>Room Configuration</h3>
             <div>
               <label className="label">Auction Room Name *</label>
               <input className={IC} value={roomName}
@@ -251,7 +251,7 @@ export default function Setup() {
             {/* Bonus tiers */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#1d4ed8'}}>Bid Bonus Tiers</span>
+                <span className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#818CF8'}}>Bid Bonus Tiers</span>
                 <button className="btn-blue px-3 py-1 text-xs"
                   onClick={()=>setRules(r=>({...r,bidBonusRules:[...r.bidBonusRules,{minBid:0,maxBid:0,bonusPoints:0,bidIncrement:10,label:'New'}]}))}>
                   + Add
@@ -259,7 +259,7 @@ export default function Setup() {
               </div>
               {rules.bidBonusRules.map((rule,i)=>(
                 <div key={i} className="flex gap-2 items-end rounded-xl p-3 border"
-                  style={{background:'rgba(29,78,216,0.04)', borderColor:'rgba(29,78,216,0.2)'}}>
+                  style={{background:'rgba(99,102,241,0.04)', borderColor:'rgba(99,102,241,0.2)'}}>
                   <div className="flex-1">
                     <label className="label">Label</label>
                     <input className={IC+' text-sm py-1.5'} value={rule.label}
@@ -299,7 +299,7 @@ export default function Setup() {
         {/* ── Step 1: Teams ── */}
         {step===1 && (
           <div style={cardStyle} className="space-y-4 animate-fade-in">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#F59E0B'}}>
               Teams <span className="text-slate-400">({teams.length}/10)</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
@@ -371,7 +371,7 @@ export default function Setup() {
         {/* ── Step 2: Players ── */}
         {step===2 && (
           <div style={cardStyle} className="space-y-4 animate-fade-in">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#F59E0B'}}>
               Players <span className="text-slate-400">({players.length})</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -412,7 +412,7 @@ export default function Setup() {
                 <div onClick={()=>playerPhotoRef.current.click()}
                   className="border-2 border-dashed border-slate-300 rounded-xl min-h-[90px]
                     flex items-center justify-center cursor-pointer transition-colors bg-slate-50 overflow-hidden"
-                  onMouseEnter={e=>e.currentTarget.style.borderColor='#dc2626'}
+                  onMouseEnter={e=>e.currentTarget.style.borderColor='#F59E0B'}
                   onMouseLeave={e=>e.currentTarget.style.borderColor='#cbd5e1'}>
                   {playerForm.photo
                     ? <img src={playerForm.photo} alt="prev" className="max-h-20 object-contain rounded-lg"/>
@@ -437,7 +437,7 @@ export default function Setup() {
                   <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-200">
                     {p.photo
                       ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover"/>
-                      : <div className="w-full h-full bg-red-50 flex items-center justify-center text-xs font-bold text-red-500">{p.name[0]}</div>}
+                      : <div className="w-full h-full bg-amber-50 flex items-center justify-center text-xs font-bold text-amber-500">{p.name[0]}</div>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold truncate text-slate-800">{p.name}</div>
@@ -465,12 +465,12 @@ export default function Setup() {
         {/* ── Step 3: Retentions ── */}
         {step===3 && (
           <div style={cardStyle} className="space-y-4 animate-fade-in">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#1d4ed8'}}>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#818CF8'}}>
               Retentions <span className="text-slate-400">(optional)</span>
             </h3>
             <p className="text-xs text-slate-400">Retain players to teams before auction. Budget deducted automatically.</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end rounded-xl p-4 border"
-              style={{background:'rgba(29,78,216,0.04)', borderColor:'rgba(29,78,216,0.2)'}}>
+              style={{background:'rgba(99,102,241,0.04)', borderColor:'rgba(99,102,241,0.2)'}}>
               <div>
                 <label className="label">Team</label>
                 <select className={IC} value={retainForm.teamIdx}
@@ -509,13 +509,13 @@ export default function Setup() {
               )}
               {retentions.map((r,i)=>(
                 <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-2.5 border"
-                  style={{background:'rgba(29,78,216,0.05)', borderColor:'rgba(29,78,216,0.2)'}}>
+                  style={{background:'rgba(99,102,241,0.05)', borderColor:'rgba(99,102,241,0.2)'}}>
                   <span>🔒</span>
                   <div className="flex-1">
                     <strong className="text-sm text-slate-800">{players[r.playerIdx]?.name}</strong>
                     <span className="text-slate-400 text-xs"> → {teams[r.teamIdx]?.name}</span>
                   </div>
-                  <span className="font-orbitron text-sm font-bold" style={{color:'#dc2626'}}>{r.price}Pts</span>
+                  <span className="font-orbitron text-sm font-bold" style={{color:'#F59E0B'}}>{r.price}Pts</span>
                   <button onClick={()=>setRetentions(rs=>rs.filter((_,idx)=>idx!==i))}
                     className="text-red-400 hover:text-red-600 transition-colors">✕</button>
                 </div>
@@ -531,7 +531,7 @@ export default function Setup() {
         {/* ── Step 4: Review ── */}
         {step===4 && (
           <div style={cardStyle} className="space-y-6 animate-fade-in">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#F59E0B'}}>
               Review & Launch
             </h3>
 
@@ -549,8 +549,8 @@ export default function Setup() {
                 ['Bonus Tiers',rules.bidBonusRules.length],
               ].map(([l,v])=>(
                 <div key={l} className="rounded-xl p-3 text-center border"
-                  style={{background:'linear-gradient(135deg,rgba(220,38,38,0.04),rgba(29,78,216,0.04))', borderColor:'rgba(29,78,216,0.15)'}}>
-                  <div className="font-orbitron text-base font-bold" style={{color:'#dc2626'}}>{v}</div>
+                  style={{background:'linear-gradient(135deg,rgba(245,158,11,0.04),rgba(99,102,241,0.04))', borderColor:'rgba(99,102,241,0.15)'}}>
+                  <div className="font-orbitron text-base font-bold" style={{color:'#F59E0B'}}>{v}</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-widest mt-1">{l}</div>
                 </div>
               ))}
@@ -575,10 +575,10 @@ export default function Setup() {
             <div className="flex gap-3 flex-wrap">
               <button className="btn-ghost px-5 py-2" onClick={()=>setStep(3)}>← Back</button>
               <button
-                className="px-12 py-3 rounded-2xl text-white font-display tracking-widest text-xl
+                className="px-12 py-3 rounded-2xl text-ink-950 font-display tracking-widest text-xl
                   transition-all hover:-translate-y-1 hover:shadow-xl disabled:opacity-60 cursor-pointer border-none"
-                style={{background:'linear-gradient(135deg,#dc2626 0%,#1d4ed8 100%)',
-                  boxShadow:loading?'none':'0 8px 32px rgba(220,38,38,0.3)'}}
+                style={{background:'linear-gradient(135deg,#FBBF24,#F59E0B)',
+                  boxShadow:loading?'none':'0 8px 32px rgba(245,158,11,0.3)'}}
                 onClick={startAuction} disabled={loading}>
                 {loading ? '⏳ Creating...' : '🚀 LAUNCH AUCTION'}
               </button>
