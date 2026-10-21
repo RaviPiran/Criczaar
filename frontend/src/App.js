@@ -58,10 +58,10 @@ function AdminRoute({ children }) {
 }
 
 const Spinner = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div className="min-h-screen flex items-center justify-center" style={{background:"radial-gradient(circle at 50% 40%,rgba(245,158,11,0.10),transparent 55%),#0A0F1D"}}>
     <div className="text-center space-y-4">
       <div className="text-5xl animate-swing inline-block" style={{ transformOrigin: 'bottom center' }}>🏏</div>
-      <p className="font-orbitron text-amber-500 text-sm tracking-widest animate-pulse-slow">LOADING...</p>
+      <p className="font-mono text-amber-500 text-xs tracking-[0.3em] animate-pulse-slow">LOADING…</p>
     </div>
   </div>
 );
@@ -112,14 +112,14 @@ export default function App() {
               position="top-right"
               toastOptions={{
                 style: {
-                  background:  '#ffffff', color: '#1a202c',
-                  border:      '1px solid #fbbf24',
-                  boxShadow:   '0 4px 20px rgba(0,0,0,0.08)',
-                  fontFamily:  "'Rajdhani', sans-serif",
-                  fontSize:    '1rem', fontWeight: 600,
+                  background:  '#121829', color: '#E3E8F6',
+                  border:      '1px solid rgba(245,158,11,0.45)',
+                  boxShadow:   '0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(245,158,11,0.12)',
+                  fontFamily:  "'Inter', sans-serif",
+                  fontSize:    '0.9rem', fontWeight: 600,
                 },
-                success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
-                error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+                success: { iconTheme: { primary: '#10B981', secondary: '#0A0F1D' } },
+                error:   { iconTheme: { primary: '#F87171', secondary: '#0A0F1D' } },
               }}
             />
           </RoomRehydrator>

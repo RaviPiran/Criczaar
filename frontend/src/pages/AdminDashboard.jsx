@@ -19,7 +19,7 @@ const statusColors = {
 };
 
 const roleColors = {
-  admin:      'bg-red-500/15  text-red-400  border-red-500/30',
+  admin:      'bg-amber-500/15  text-amber-400  border-amber-500/30',
   auctioneer: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   viewer:     'bg-slate-500/15 text-slate-400 border-slate-500/30',
 };
@@ -69,11 +69,39 @@ function formatDateTime(dateLike) {
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${h}:${mm} ${ampm}`;
 }
 
+// eased count-up for numeric stats
+function useCountUp(target, duration = 900) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    const to = Number(target);
+    if (Number.isNaN(to)) return;
+    let raf, start;
+    const step = (t) => {
+      if (!start) start = t;
+      const p = Math.min((t - start) / duration, 1);
+      setVal(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return val;
+}
+
 function StatCard({ label, value, accent }) {
+  const numeric = typeof value === 'number' || (typeof value === 'string' && /^[\d,]+$/.test(value));
+  const raw = numeric ? Number(String(value).replace(/,/g, '')) : 0;
+  const n = useCountUp(raw);
   return (
-    <div className="rounded-2xl border border-white/10 p-5" style={{ background: 'rgba(255,255,255,0.04)' }}>
-      <div className="text-xs text-white/40 font-raj uppercase tracking-widest">{label}</div>
-      <div className={`font-display text-3xl mt-1 ${accent || 'text-white'}`}>{value}</div>
+    <div className="spot rounded-2xl border border-white/10 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40"
+      style={{ background: 'rgba(255,255,255,0.04)', animation: 'riseIn .6s cubic-bezier(.22,1,.36,1) backwards' }}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
+      }}>
+      <div className="text-[10px] text-white/40 font-mono uppercase tracking-[0.18em]">{label}</div>
+      <div className={`font-mono font-bold text-3xl mt-2 ${accent || 'text-white'}`}>{numeric ? n.toLocaleString() : value}</div>
     </div>
   );
 }
@@ -354,15 +382,15 @@ export default function AdminDashboard() {
 
   return (
     <CricBg>
-      <div className="min-h-screen" style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%)' }}>
+      <div className="min-h-screen" style={{ background: 'linear-gradient(135deg,#0A0F1D 0%,#121829 60%,#0A0F1D 100%)' }}>
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-blue-700 flex items-center justify-center">
-              <span className="text-white font-display text-lg">A</span>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-indigo-500 flex items-center justify-center animate-glow-pulse">
+              <span className="font-display text-lg" style={{color:"#0A0F1D"}}>A</span>
             </div>
             <div>
-              <div className="font-display text-2xl text-white leading-none">ADMIN <span className="text-red-500">PANEL</span></div>
+              <div className="font-display text-2xl text-white leading-none">ADMIN <span className="text-gradient">PANEL</span></div>
               <div className="text-xs text-white/40 font-raj tracking-widest">PLATFORM CONTROL</div>
             </div>
           </div>
@@ -378,18 +406,19 @@ export default function AdminDashboard() {
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
           {/* Tabs */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {tabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
-                className="px-5 py-2.5 rounded-xl font-raj font-bold text-sm transition-all"
+                className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
                 style={tab === t.id
-                  ? { background: 'linear-gradient(135deg,#dc2626,#b91c1c)', color: '#fff' }
+                  ? { background: 'linear-gradient(135deg,#FBBF24,#F59E0B)', color: '#0A0F1D' }
                   : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 {t.label}
               </button>
             ))}
           </div>
 
+          <div key={tab} className="page-enter">
           {loading ? (
             <div className="text-center text-white/40 font-raj py-16">Loading admin data...</div>
           ) : loadError ? (
@@ -418,14 +447,14 @@ export default function AdminDashboard() {
                 <StatCard label="Setup"     value={stats.roomsByStatus.setup}     accent="text-blue-400" />
                 <StatCard label="Completed" value={stats.roomsByStatus.completed} accent="text-slate-400" />
               </div>
-              <StatCard label="Total Points Transacted (all rooms)" value={stats.totalMoneyTransacted.toLocaleString()} accent="text-red-400" />
+              <StatCard label="Total Points Transacted (all rooms)" value={stats.totalMoneyTransacted.toLocaleString()} accent="text-amber-400" />
             </div>
           ) : tab === 'users' ? (
             <div className="space-y-4">
               <input
                 value={userQuery} onChange={e => setUserQuery(e.target.value)}
                 placeholder="Search by name or email..."
-                className="w-full max-w-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-red-400/60 placeholder:text-white/20"
+                className="w-full max-w-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-amber-400/60 placeholder:text-white/20"
               />
               <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
                 <table className="w-full text-sm font-raj">
@@ -450,9 +479,9 @@ export default function AdminDashboard() {
                             onChange={e => handleRoleChange(u._id, e.target.value)}
                             disabled={u._id === user?._id}
                             className={`text-xs font-bold px-2 py-1 rounded-lg border bg-transparent ${roleColors[u.role] || roleColors.viewer} disabled:opacity-50`}>
-                            <option value="admin" className="bg-slate-800">admin</option>
-                            <option value="auctioneer" className="bg-slate-800">auctioneer</option>
-                            <option value="viewer" className="bg-slate-800">viewer</option>
+                            <option value="admin" className="bg-surface">admin</option>
+                            <option value="auctioneer" className="bg-surface">auctioneer</option>
+                            <option value="viewer" className="bg-surface">viewer</option>
                           </select>
                         </td>
                         <td className="px-4 py-3">{u.roomCount}</td>
@@ -481,7 +510,7 @@ export default function AdminDashboard() {
               <input
                 value={roomQuery} onChange={e => setRoomQuery(e.target.value)}
                 placeholder="Search by room name, code, or owner email..."
-                className="w-full max-w-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-red-400/60 placeholder:text-white/20"
+                className="w-full max-w-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-amber-400/60 placeholder:text-white/20"
               />
               <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
                 <table className="w-full text-sm font-raj">
@@ -509,10 +538,10 @@ export default function AdminDashboard() {
                             value={r.status}
                             onChange={e => handleRoomStatus(r._id, e.target.value)}
                             className={`text-xs font-bold px-2 py-1 rounded-lg border bg-transparent ${statusColors[r.status] || statusColors.setup}`}>
-                            <option value="setup" className="bg-slate-800">setup</option>
-                            <option value="active" className="bg-slate-800">active</option>
-                            <option value="paused" className="bg-slate-800">paused</option>
-                            <option value="completed" className="bg-slate-800">completed</option>
+                            <option value="setup" className="bg-surface">setup</option>
+                            <option value="active" className="bg-surface">active</option>
+                            <option value="paused" className="bg-surface">paused</option>
+                            <option value="completed" className="bg-surface">completed</option>
                           </select>
                         </td>
                         <td className="px-4 py-3">{r.teamCount}</td>
@@ -545,10 +574,10 @@ export default function AdminDashboard() {
                 <select
                   value={liveRoomId}
                   onChange={e => loadLivePlayers(e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-red-400/60">
-                  <option value="" className="bg-slate-800">Select a room...</option>
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-amber-400/60">
+                  <option value="" className="bg-surface">Select a room...</option>
                   {rooms.map(r => (
-                    <option key={r._id} value={r._id} className="bg-slate-800">
+                    <option key={r._id} value={r._id} className="bg-surface">
                       {r.name} ({r.code}) — {r.status}
                     </option>
                   ))}
@@ -632,7 +661,7 @@ export default function AdminDashboard() {
                                 autoFocus type="number" value={editPrice}
                                 onChange={e => setEditPrice(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && saveEditPrice(p)}
-                                className="w-24 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-red-400/60"
+                                className="w-24 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-amber-400/60"
                               />
                             ) : (
                               <span>{['sold', 'retained'].includes(p.status) ? `${p.soldPrice} pts` : '—'}</span>
@@ -670,7 +699,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-white/30 font-raj">Auctions waiting to start, soonest first.</span>
                 <button onClick={() => setShowCreateForm(v => !v)}
-                  className="text-xs font-bold text-white bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg transition-colors">
+                  className="text-xs font-bold text-ink-950 bg-amber-500 hover:bg-amber-400 px-4 py-2 rounded-lg transition-all hover:-translate-y-0.5">
                   {showCreateForm ? 'Cancel' : '+ New Scheduled Auction'}
                 </button>
               </div>
@@ -682,18 +711,18 @@ export default function AdminDashboard() {
                       <label className="text-xs text-white/40 font-raj uppercase tracking-widest">Room Name *</label>
                       <input value={newRoom.name} onChange={e => setNewRoom(f => ({ ...f, name: e.target.value }))}
                         placeholder="e.g. IPL Mega Auction"
-                        className="w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-raj focus:outline-none focus:border-red-400/60 placeholder:text-white/20" />
+                        className="w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-raj focus:outline-none focus:border-amber-400/60 placeholder:text-white/20" />
                     </div>
                     <div>
                       <label className="text-xs text-white/40 font-raj uppercase tracking-widest">Tournament (optional)</label>
                       <input value={newRoom.tournament} onChange={e => setNewRoom(f => ({ ...f, tournament: e.target.value }))}
                         placeholder="e.g. IPL 2026"
-                        className="w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-raj focus:outline-none focus:border-red-400/60 placeholder:text-white/20" />
+                        className="w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-raj focus:outline-none focus:border-amber-400/60 placeholder:text-white/20" />
                     </div>
                     <div>
                       <label className="text-xs text-white/40 font-raj uppercase tracking-widest">Scheduled Start</label>
                       <input type="datetime-local" value={newRoom.scheduledAt} onChange={e => setNewRoom(f => ({ ...f, scheduledAt: e.target.value }))}
-                        className="w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-raj focus:outline-none focus:border-red-400/60" />
+                        className="w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-raj focus:outline-none focus:border-amber-400/60" />
                     </div>
                   </div>
                   <div className="flex justify-end">
@@ -724,14 +753,14 @@ export default function AdminDashboard() {
                         <div className="text-xs text-white/40 font-raj">
                           {formatDateTime(r.scheduledAt)}
                         </div>
-                        <div className={`font-display text-2xl ${cd.overdue ? 'text-red-400' : 'text-emerald-400'}`}>
+                        <div className={`font-display text-2xl ${cd.overdue ? 'text-amber-400' : 'text-emerald-400'}`}>
                           {cd.overdue ? '⚠ Overdue' : cd.text}
                         </div>
                         {scheduleEditId === r._id ? (
                           <div className="flex items-center gap-2">
                             <input type="datetime-local" value={scheduleEditValue}
                               onChange={e => setScheduleEditValue(e.target.value)}
-                              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:border-red-400/60" />
+                              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:border-amber-400/60" />
                             <button onClick={() => handleSetSchedule(r._id, scheduleEditValue)} className="text-xs font-bold text-emerald-400 hover:text-emerald-300">Save</button>
                             <button onClick={() => setScheduleEditId(null)} className="text-xs font-bold text-white/40 hover:text-white">Cancel</button>
                           </div>
@@ -768,7 +797,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-2">
                               <input type="datetime-local" value={scheduleEditValue}
                                 onChange={e => setScheduleEditValue(e.target.value)}
-                                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:border-red-400/60" />
+                                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:border-amber-400/60" />
                               <button onClick={() => handleSetSchedule(r._id, scheduleEditValue)} className="text-xs font-bold text-emerald-400 hover:text-emerald-300">Save</button>
                               <button onClick={() => setScheduleEditId(null)} className="text-xs font-bold text-white/40 hover:text-white">Cancel</button>
                             </div>
@@ -823,6 +852,7 @@ export default function AdminDashboard() {
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
     </CricBg>

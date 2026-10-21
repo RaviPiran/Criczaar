@@ -1,53 +1,49 @@
 import React from 'react';
 
 /**
- * CricBg — wraps any page with the cricket stadium background.
- * Renders:
- *  1. A gradient base (red+blue tinted light slate)
- *  2. SVG cricket pitch overlay
- *  3. Diagonal lines texture
- *  4. Scattered cricket emoji blobs
+ * CricBg — wraps any page with the CricZaar dark stadium background.
+ *  1. Ink base (#0A0F1D) with soft amber / indigo / sky tint
+ *  2. SVG cricket pitch overlay + diagonal line texture + dot grid
+ *  3. Drifting colour orbs (primary / secondary / tertiary)
+ *  4. Floating cricket emojis that gently bob
  *  5. Children on top (z-index 1)
  */
 export default function CricBg({ children, className = '' }) {
   return (
     <div className={`relative min-h-full ${className}`}
       style={{
-        background: 'linear-gradient(160deg,#dde5f4 0%,#e8ecf7 40%,#dde8f5 70%,#e6ddf4 100%)',
+        background: 'radial-gradient(1200px 600px at 12% -10%,rgba(245,158,11,0.07),transparent 60%),radial-gradient(900px 600px at 100% 110%,rgba(99,102,241,0.10),transparent 60%),#0A0F1D',
       }}>
 
-      {/* Cricket pitch SVG — centred, faint */}
       <div className="pitch-overlay" aria-hidden="true"/>
-
-      {/* Diagonal lines texture */}
       <div className="lines-overlay" aria-hidden="true"/>
+      <div className="dot-grid" aria-hidden="true" style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none',opacity:.6}}/>
 
-      {/* Red glow — top left */}
-      <div aria-hidden="true" style={{
-        position:'fixed', top:'-80px', left:'-80px',
-        width:380, height:380, borderRadius:'50%',
-        background:'radial-gradient(circle,rgba(220,38,38,0.10) 0%,transparent 70%)',
-        pointerEvents:'none', zIndex:0,
+      {/* Amber orb — top left */}
+      <div className="orb" aria-hidden="true" style={{
+        top:'-120px', left:'-120px', width:420, height:420,
+        background:'radial-gradient(circle,rgba(245,158,11,0.16) 0%,transparent 70%)',
+      }}/>
+      {/* Indigo orb — bottom right */}
+      <div className="orb" aria-hidden="true" style={{
+        bottom:'-140px', right:'-120px', width:480, height:480, animationDelay:'-6s',
+        background:'radial-gradient(circle,rgba(99,102,241,0.18) 0%,transparent 70%)',
+      }}/>
+      {/* Sky orb — middle right */}
+      <div className="orb" aria-hidden="true" style={{
+        top:'38%', right:'18%', width:300, height:300, animationDelay:'-11s',
+        background:'radial-gradient(circle,rgba(56,189,248,0.10) 0%,transparent 70%)',
       }}/>
 
-      {/* Blue glow — bottom right */}
-      <div aria-hidden="true" style={{
-        position:'fixed', bottom:'-80px', right:'-80px',
-        width:420, height:420, borderRadius:'50%',
-        background:'radial-gradient(circle,rgba(29,78,216,0.10) 0%,transparent 70%)',
-        pointerEvents:'none', zIndex:0,
-      }}/>
-
-      {/* Floating cricket emojis — decorative, fixed */}
       {[
-        { emoji:'🏏', top:'8%',  left:'3%',  size:28, opacity:0.12, rotate:-20 },
-        { emoji:'🏟', top:'18%', right:'4%', size:32, opacity:0.09, rotate:10 },
-        { emoji:'🎯', top:'55%', left:'2%',  size:24, opacity:0.10, rotate:0  },
-        { emoji:'🏆', top:'72%', right:'3%', size:28, opacity:0.10, rotate:15 },
-        { emoji:'🏏', top:'85%', left:'6%',  size:22, opacity:0.08, rotate:35 },
-        { emoji:'⚡', top:'40%', right:'2%', size:20, opacity:0.09, rotate:-10},
+        { emoji:'🏏', top:'8%',  left:'3%',  size:28, opacity:0.14, rotate:-20, delay:0 },
+        { emoji:'🏟', top:'18%', right:'4%', size:32, opacity:0.10, rotate:10,  delay:-1.5 },
+        { emoji:'🎯', top:'55%', left:'2%',  size:24, opacity:0.12, rotate:0,   delay:-3 },
+        { emoji:'🏆', top:'72%', right:'3%', size:28, opacity:0.12, rotate:15,  delay:-4.5 },
+        { emoji:'🏏', top:'85%', left:'6%',  size:22, opacity:0.10, rotate:35,  delay:-2 },
+        { emoji:'⚡', top:'40%', right:'2%', size:20, opacity:0.12, rotate:-10, delay:-5 },
       ].map((d, i) => (
-        <div key={i} aria-hidden="true" style={{
+        <div key={i} aria-hidden="true" className="bob" style={{
           position:'fixed',
           top:    d.top    || 'auto',
           bottom: d.bottom || 'auto',
@@ -55,7 +51,8 @@ export default function CricBg({ children, className = '' }) {
           right:  d.right  || 'auto',
           fontSize: d.size,
           opacity:  d.opacity,
-          transform:`rotate(${d.rotate}deg)`,
+          '--r': `${d.rotate}deg`,
+          animationDelay: `${d.delay}s`,
           pointerEvents:'none',
           zIndex: 0,
           userSelect:'none',
@@ -63,7 +60,6 @@ export default function CricBg({ children, className = '' }) {
         }}>{d.emoji}</div>
       ))}
 
-      {/* Page content */}
       <div style={{position:'relative', zIndex:1}}>
         {children}
       </div>

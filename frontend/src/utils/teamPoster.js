@@ -73,7 +73,7 @@ async function drawPlayerCard(ctx, x, y, player, accent) {
   ctx.clip();
 
   // photo / silhouette area
-  ctx.fillStyle = '#dbe3ea';
+  ctx.fillStyle = '#171E33';
   ctx.fillRect(x, y, CARD_W, IMG_H);
 
   const img = player.photo ? await loadImage(player.photo) : null;
@@ -82,7 +82,7 @@ async function drawPlayerCard(ctx, x, y, player, accent) {
     const iw = img.width * scale, ih = img.height * scale;
     ctx.drawImage(img, x + (CARD_W - iw) / 2, y + (IMG_H - ih) / 2, iw, ih);
   } else {
-    drawSilhouette(ctx, x, y + 14, CARD_W, IMG_H - 14, '#aab4bf');
+    drawSilhouette(ctx, x, y + 14, CARD_W, IMG_H - 14, '#2E3A5C');
   }
 
   // diagonal accent stripe across the bottom of the photo area
@@ -93,7 +93,7 @@ async function drawPlayerCard(ctx, x, y, player, accent) {
   const stripeY = y + IMG_H - 34;
   const grad = ctx.createLinearGradient(x, stripeY, x + CARD_W, stripeY + 40);
   grad.addColorStop(0, accent);
-  grad.addColorStop(1, '#f59e0b');
+  grad.addColorStop(1, '#6366F1');
   ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.moveTo(x, stripeY + 40);
@@ -106,27 +106,31 @@ async function drawPlayerCard(ctx, x, y, player, accent) {
 
   // role label (top-left)
   if (player.role) {
-    ctx.font = '800 15px Arial, sans-serif';
-    ctx.fillStyle = '#16233d';
+    ctx.font = '700 12px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#FBBF24';
+    ctx.shadowColor = 'rgba(10,15,29,0.9)'; ctx.shadowBlur = 6;
     ctx.textAlign = 'left';
     const lines = wrapWords(ctx, player.role, CARD_W - 24);
     lines.slice(0, 2).forEach((line, i) => ctx.fillText(line, x + 12, y + 22 + i * 18));
+    ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
   }
 
   // captain / vice-captain tag (top-right, only if provided)
   if (player.tag) {
-    ctx.font = '700 14px Arial, sans-serif';
-    ctx.fillStyle = '#16233d';
+    ctx.font = '700 13px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'right';
     ctx.fillText(player.tag, x + CARD_W - 10, y + 38);
   }
 
   // name band
-  ctx.fillStyle = '#16233d';
+  ctx.fillStyle = '#0F1629';
   ctx.fillRect(x, y + IMG_H, CARD_W, NAME_H);
+  ctx.fillStyle = '#F59E0B';
+  ctx.fillRect(x, y + IMG_H, CARD_W, 3);
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '700 20px "Poppins", Arial, sans-serif';
+  ctx.fillStyle = '#E3E8F6';
+  ctx.font = '700 20px "Outfit", "Inter", Arial, sans-serif';
   const nameParts = player.name.split(' ');
   const first = nameParts[0] || '';
   const rest = nameParts.slice(1).join(' ');
@@ -141,7 +145,7 @@ async function drawPlayerCard(ctx, x, y, player, accent) {
   ctx.restore(); // un-clip card
 
   // card border
-  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.strokeStyle = 'rgba(245,158,11,0.35)';
   ctx.lineWidth = 1.5;
   drawRoundedRect(ctx, x, y, CARD_W, CARD_H, 14);
   ctx.stroke();
@@ -151,7 +155,7 @@ async function drawBadgeCard(ctx, x, y, team) {
   drawRoundedRect(ctx, x, y, CARD_W, CARD_H, 14);
   ctx.save();
   ctx.clip();
-  ctx.fillStyle = '#eef1f5';
+  ctx.fillStyle = '#121829';
   ctx.fillRect(x, y, CARD_W, CARD_H);
 
   const logoImg = await loadImage(team.logo);
@@ -166,36 +170,43 @@ async function drawBadgeCard(ctx, x, y, team) {
     const iw = logoImg.width * scale, ih = logoImg.height * scale;
     ctx.drawImage(logoImg, cx - iw / 2, cy - ih / 2, iw, ih);
   } else {
-    ctx.fillStyle = team.color || '#dc2626';
+    ctx.fillStyle = team.color || '#F59E0B';
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#0A0F1D';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = `800 ${r}px "Poppins", Arial, sans-serif`;
+    ctx.font = `800 ${r}px "Outfit", "Inter", Arial, sans-serif`;
     ctx.fillText((team.name || '?')[0].toUpperCase(), cx, cy + 6);
     ctx.textBaseline = 'alphabetic';
   }
   ctx.restore();
-  ctx.strokeStyle = team.color || '#dc2626';
+  ctx.strokeStyle = team.color || '#F59E0B';
   ctx.lineWidth = 4;
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
 
-  ctx.fillStyle = '#16233d';
-  ctx.font = '800 22px "Poppins", Arial, sans-serif';
+  ctx.fillStyle = '#E3E8F6';
+  ctx.font = '800 22px "Outfit", "Inter", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(team.name || 'TEAM', x + CARD_W / 2, y + CARD_H - 34);
 
   ctx.restore();
-  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.strokeStyle = 'rgba(245,158,11,0.35)';
   ctx.lineWidth = 1.5;
   drawRoundedRect(ctx, x, y, CARD_W, CARD_H, 14);
   ctx.stroke();
 }
 
 export async function downloadTeamCard(team) {
-  try { await document.fonts.ready; } catch { /* ignore */ }
+  try {
+    await Promise.all([
+      document.fonts.load('700 20px Outfit'),
+      document.fonts.load('800 22px Outfit'),
+      document.fonts.load('700 12px "JetBrains Mono"'),
+    ]);
+    await document.fonts.ready;
+  } catch { /* ignore */ }
 
-  const accent = team.color || '#dc2626';
+  const accent = team.color || '#F59E0B';
   const squad = (team.players || []).filter(e => e.player).map(e => ({
     name: e.player.name || '—',
     photo: e.player.photo || '',
@@ -216,12 +227,12 @@ export async function downloadTeamCard(team) {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // outer lavender-grey frame
-  ctx.fillStyle = '#c7c8d6';
+  // outer ink frame
+  ctx.fillStyle = '#0A0F1D';
   ctx.fillRect(0, 0, W, H);
   drawRoundedRect(ctx, OUTER_PAD / 2, OUTER_PAD / 2, W - OUTER_PAD, H - OUTER_PAD, 16);
   ctx.lineWidth = OUTER_PAD;
-  ctx.strokeStyle = '#b9bad0';
+  ctx.strokeStyle = '#222B45';
   ctx.stroke();
 
   const gridX = OUTER_PAD + INNER_PAD;

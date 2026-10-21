@@ -92,15 +92,15 @@ export default function Tournaments() {
 
   return (
     <CricBg>
-      <div className="min-h-screen" style={{background:'linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%)'}}>
+      <div className="min-h-screen" style={{background:'linear-gradient(135deg,#0A0F1D 0%,#121829 60%,#0A0F1D 100%)'}}>
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-blue-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-blue-700 flex items-center justify-center">
               <span className="text-white font-display text-lg">C</span>
             </div>
             <div>
-              <div className="font-display text-2xl text-white leading-none">CRIC<span className="text-red-500">ZAAR</span></div>
+              <div className="font-display text-2xl text-white leading-none">CRIC<span className="text-amber-500">ZAAR</span></div>
               <div className="text-xs text-white/40 font-raj tracking-widest">AUCTION PLATFORM</div>
             </div>
           </div>
@@ -108,12 +108,12 @@ export default function Tournaments() {
       <div className="text-sm text-white/60 font-raj hidden sm:block">👋 {user?.name}</div>
       {user?.role === 'admin' && (
         <button onClick={() => navigate('/admin')}
-          className="text-xs font-raj font-semibold text-red-400 hover:text-red-300 transition-colors border border-red-400/30 px-3 py-1.5 rounded-lg hover:border-red-400/60">
+          className="text-xs font-raj font-semibold text-amber-400 hover:text-amber-300 transition-colors border border-amber-400/30 px-3 py-1.5 rounded-lg hover:border-amber-400/60">
           🛠 Admin Panel
         </button>
       )}
       <button onClick={logout}
-        className="text-xs font-raj font-semibold text-white/40 hover:text-red-400 transition-colors border border-white/10 px-3 py-1.5 rounded-lg hover:border-red-400/40">
+        className="text-xs font-raj font-semibold text-white/40 hover:text-amber-400 transition-colors border border-white/10 px-3 py-1.5 rounded-lg hover:border-amber-400/40">
         Logout
       </button>
     </div>
@@ -124,7 +124,7 @@ export default function Tournaments() {
           {/* Hero */}
           <div className="text-center space-y-3">
             <h1 className="font-display text-5xl text-white tracking-wide drop-shadow">
-              My <span className="text-red-500">Tournaments</span>
+              My <span className="text-amber-500">Tournaments</span>
             </h1>
             <p className="text-white/50 font-raj text-base">Create a tournament, run auctions, view history — all in one place.</p>
           </div>
@@ -134,7 +134,7 @@ export default function Tournaments() {
             <button
               onClick={() => setShowCreate(s => !s)}
               className="flex items-center gap-2 px-8 py-3.5 rounded-2xl font-display tracking-widest text-white font-bold text-base shadow-lg hover:-translate-y-0.5 transition-all"
-              style={{background:'linear-gradient(135deg,#dc2626,#b91c1c)'}}>
+              style={{background:'linear-gradient(135deg,#F59E0B,#D97706)'}}>
               {showCreate ? '✕ Cancel' : '+ New Tournament'}
             </button>
           </div>
@@ -147,7 +147,7 @@ export default function Tournaments() {
               <div className="flex flex-col items-center gap-3">
                 <div
                   onClick={() => logoRef.current?.click()}
-                  className="w-24 h-24 rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-red-400/60 transition-colors overflow-hidden"
+                  className="w-24 h-24 rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-amber-400/60 transition-colors overflow-hidden"
                   style={{background:'rgba(255,255,255,0.04)'}}>
                   {tLogo
                     ? <img src={tLogo} alt="logo" className="w-full h-full object-cover"/>
@@ -163,13 +163,13 @@ export default function Tournaments() {
                 <input
                   value={tName} onChange={e => setTName(e.target.value)}
                   placeholder="e.g. IPL 2025, Office League..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-red-400/60 transition-colors placeholder:text-white/20"/>
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-raj focus:outline-none focus:border-amber-400/60 transition-colors placeholder:text-white/20"/>
               </div>
               <button
                 onClick={handleCreateNew}
                 disabled={!tName.trim()}
-                className="w-full py-3 rounded-xl font-display tracking-widest text-white font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5"
-                style={{background:'linear-gradient(135deg,#dc2626,#1d4ed8)'}}>
+                className="w-full py-3 rounded-xl font-display tracking-widest text-ink-950 font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5"
+                style={{background:'linear-gradient(135deg,#FBBF24,#F59E0B)'}}>
                 🚀 Setup Auction →
               </button>
             </div>
@@ -217,8 +217,8 @@ export default function Tournaments() {
                         <div key={room._id}
                           className="rounded-2xl border-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
                           style={{
-                            background: isCurrentlyLoaded ? 'rgba(220,38,38,0.08)' : 'rgba(255,255,255,0.03)',
-                            borderColor: isCurrentlyLoaded ? 'rgba(220,38,38,0.5)' : 'rgba(255,255,255,0.08)',
+                            background: isCurrentlyLoaded ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.03)',
+                            borderColor: isCurrentlyLoaded ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.08)',
                             backdropFilter: 'blur(12px)',
                           }}>
                           <div className="p-5">
@@ -242,7 +242,7 @@ export default function Tournaments() {
                                 <button
                                   onClick={() => navigate('/dashboard')}
                                   className="flex-1 text-xs font-bold py-2 rounded-xl border transition-all"
-                                  style={{borderColor:'rgba(220,38,38,0.5)', color:'#ef4444', background:'rgba(220,38,38,0.08)'}}>
+                                  style={{borderColor:'rgba(245,158,11,0.5)', color:'#ef4444', background:'rgba(245,158,11,0.08)'}}>
                                   ● Currently Active
                                 </button>
                               ) : isCompleted ? (
@@ -258,7 +258,7 @@ export default function Tournaments() {
                                   onClick={() => handleEnterRoom(room)}
                                   disabled={isSwitching}
                                   className="flex-1 text-xs font-bold py-2 rounded-xl border transition-all hover:-translate-y-0.5 disabled:opacity-40"
-                                  style={{borderColor:'rgba(29,78,216,0.4)', color:'#60a5fa', background:'rgba(29,78,216,0.08)'}}>
+                                  style={{borderColor:'rgba(99,102,241,0.4)', color:'#38BDF8', background:'rgba(99,102,241,0.08)'}}>
                                   {isSwitching ? '⏳ Loading…' : '→ Enter Auction'}
                                 </button>
                               )}

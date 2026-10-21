@@ -35,7 +35,7 @@ export default function BidRules() {
         </div>
 
         <div className="glass-card rounded-2xl p-6 space-y-5">
-          <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#dc2626'}}>Core Auction Rules</h3>
+          <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#F59E0B'}}>Core Auction Rules</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[{k:'basePrice',l:'Base Price (Cr)',s:0.1,m:0.1},{k:'bidIncrement',l:'Bid Increment (Cr)',s:0.1,m:0.1},
               {k:'timerSeconds',l:'Timer (seconds)',s:1,m:10},{k:'rtmCards',l:'RTM Cards / Team',s:1,m:0}].map(({k,l,s,m})=>(
@@ -47,16 +47,16 @@ export default function BidRules() {
 
         <div className="glass-card rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#1d4ed8'}}>Bid Bonus Point Tiers</h3>
+            <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{color:'#818CF8'}}>Bid Bonus Point Tiers</h3>
             <button className="btn-blue px-3 py-1.5 text-xs" onClick={addBonus}>+ Add Tier</button>
           </div>
           <p className="text-xs text-slate-400">Teams earn bonus points when a player sells within a price range.</p>
           <div className="space-y-3">
             {rules.bidBonusRules?.map((rule,i)=>(
               <div key={i} className="flex gap-3 items-end rounded-xl p-4 border"
-                style={{background:'rgba(29,78,216,0.04)',borderColor:'rgba(29,78,216,0.2)'}}>
+                style={{background:'rgba(99,102,241,0.04)',borderColor:'rgba(99,102,241,0.2)'}}>
                 <div className="w-1 self-stretch rounded-full flex-shrink-0"
-                  style={{background:`linear-gradient(180deg,#dc2626,#1d4ed8)`}}/>
+                  style={{background:`linear-gradient(180deg,#F59E0B,#6366F1)`}}/>
                 <div className="flex-1"><label className="label">Label</label>
                   <input className="input" value={rule.label} onChange={e=>updBonus(i,'label',e.target.value)} placeholder="e.g. Gold Range"/></div>
                 <div className="w-28"><label className="label">Min (Cr)</label>
@@ -79,8 +79,8 @@ export default function BidRules() {
           </div>
         </div>
 
-        <button className="px-8 py-3 text-base rounded-xl text-white font-display tracking-widest font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40"
-          style={{background:'linear-gradient(135deg,#dc2626,#1d4ed8)'}}
+        <button className="px-8 py-3 text-base rounded-xl text-ink-950 font-display tracking-widest font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40"
+          style={{background:'linear-gradient(135deg,#FBBF24,#F59E0B)'}}
           onClick={save} disabled={saving||!room}>
           {saving?'⏳ Saving...':'💾 Save Rules'}
         </button>

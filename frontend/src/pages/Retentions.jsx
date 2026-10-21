@@ -138,7 +138,7 @@ export default function Retentions() {
           {[
             ['🔒', retainedPlayers.length,  'Retained',  'text-blue-700',  'glass-card'],
             ['⏳', availablePlayers.length,  'Available', 'text-slate-700', 'glass-card'],
-            ['💰', teams.length,             'Teams',     'text-red-700',   'glass-card-red'],
+            ['💰', teams.length,             'Teams',     'text-amber-700',   'glass-card-red'],
           ].map(([em, v, l, c, cls]) => (
             <div key={l} className={`${cls} flex items-center gap-2 rounded-xl px-4 py-2.5`}>
               <span className="text-2xl">{em}</span>
@@ -152,7 +152,7 @@ export default function Retentions() {
 
         {/* Add Retention Form */}
         <div className="glass-card-red rounded-2xl p-6 space-y-4">
-          <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{ color: '#dc2626' }}>
+          <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{ color: '#F59E0B' }}>
             Add Retention
           </h3>
 
@@ -176,7 +176,7 @@ export default function Retentions() {
                 </select>
                 {/* FIX: Show team budget live */}
                 {selectedTeam && (
-                  <div className="text-xs mt-1 font-semibold" style={{ color: budgetOk ? '#059669' : '#dc2626' }}>
+                  <div className="text-xs mt-1 font-semibold" style={{ color: budgetOk ? '#059669' : '#F59E0B' }}>
                     Budget: {budgetLeft.toFixed(1)} pts {!budgetOk && '⚠ Not enough'}
                   </div>
                 )}
@@ -201,7 +201,7 @@ export default function Retentions() {
                 <label className="label">Retain Price (pts)</label>
                 <div className="flex gap-2">
                   <input
-                    className={`input ${!budgetOk && form.price ? 'border-red-400 focus:ring-red-300' : ''}`}
+                    className={`input ${!budgetOk && form.price ? 'border-amber-400 focus:ring-amber-300' : ''}`}
                     type="number" step="0.5" min="0"
                     value={form.price}
                     onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
@@ -221,7 +221,7 @@ export default function Retentions() {
 
         {/* Retained players list */}
         <div className="glass-card rounded-2xl p-6 space-y-4">
-          <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{ color: '#1d4ed8' }}>
+          <h3 className="font-orbitron text-xs tracking-widest uppercase" style={{ color: '#6366F1' }}>
             Retained Players <span className="text-slate-400">({retainedPlayers.length})</span>
           </h3>
 
@@ -240,10 +240,10 @@ export default function Retentions() {
                 return (
                   <div key={p._id}
                     className="flex items-center gap-4 rounded-xl p-4 border"
-                    style={{ background: 'rgba(29,78,216,0.04)', borderColor: 'rgba(29,78,216,0.2)' }}>
+                    style={{ background: 'rgba(99,102,241,0.04)', borderColor: 'rgba(99,102,241,0.2)' }}>
 
                     {/* Avatar */}
-                    <div className="w-11 h-11 rounded-full overflow-hidden border-2 flex-shrink-0" style={{ borderColor: '#1d4ed8' }}>
+                    <div className="w-11 h-11 rounded-full overflow-hidden border-2 flex-shrink-0" style={{ borderColor: '#6366F1' }}>
                       {p.photo
                         ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover"/>
                         : <div className="w-full h-full bg-blue-100 flex items-center justify-center font-display text-lg text-blue-600">{p.name?.[0]}</div>}
@@ -270,7 +270,7 @@ export default function Retentions() {
                     )}
 
                     {/* Price */}
-                    <div className="font-orbitron font-bold text-sm flex-shrink-0" style={{ color: '#dc2626' }}>
+                    <div className="font-orbitron font-bold text-sm flex-shrink-0" style={{ color: '#F59E0B' }}>
                       {(p.retainPrice ?? p.soldPrice ?? 0)} pts
                     </div>
 
@@ -282,7 +282,7 @@ export default function Retentions() {
                     <button
                       onClick={() => handleRelease(p)}
                       disabled={releasing === p._id}
-                      className="ml-2 text-xs text-red-400 hover:text-red-600 border border-red-200 hover:border-red-400 px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-40 flex-shrink-0">
+                      className="ml-2 text-xs text-amber-400 hover:text-amber-600 border border-amber-200 hover:border-amber-400 px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-40 flex-shrink-0">
                       {releasing === p._id ? '⏳' : '🔓 Release'}
                     </button>
                   </div>

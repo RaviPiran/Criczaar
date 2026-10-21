@@ -8,7 +8,7 @@ import PlayerCard from '../components/PlayerCard';
 import CricBg from '../components/CricBg';
 import { downloadTeamCard } from '../utils/teamPoster';
 
-const COLORS = ['var(--primary-500)','var(--secondary-500)','#10b981','#f59e0b','#06b6d4','#f97316','#a855f7','#f43f5e','#14b8a6','#eab308'];
+const COLORS = ['#F59E0B','#6366F1','#10b981','#f59e0b','#38BDF8','#f97316','#a855f7','#f43f5e','#14b8a6','#FBBF24'];
 function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
 
 // Shows this team's bidding link + code (only known to admin — teamCode is
@@ -23,7 +23,7 @@ function TeamBidLink({ team, roomCode }) {
       <div className="min-w-0">
         <div className="text-slate-400 uppercase tracking-widest text-[10px]">Bid Link · Code</div>
         <div className="truncate font-raj text-slate-700">{link}</div>
-        <div className="font-display tracking-[0.2em] text-red-600">{team.teamCode}</div>
+        <div className="font-display tracking-[0.2em] text-amber-600">{team.teamCode}</div>
       </div>
       <div className="flex flex-col gap-1 flex-shrink-0">
         <button onClick={()=>copy(link,'Link')} className="btn-ghost px-3 py-1 text-[11px]">Copy Link</button>
@@ -175,7 +175,7 @@ export default function Teams() {
             ['Players',      totalPlayers,                                         'text-blue-700',  'glass-card'],
             ['Retained',     totalRetained,                                        'text-blue-600',  'glass-card'],
             ['Total Budget', `${teams.reduce((s,t)=>s+t.budget,0)} pts`,          'text-slate-700', 'glass-card'],
-            ['Total Spent',  `${Math.round(totalSpent)} pts`,                     'text-red-600',   'glass-card-red'],
+            ['Total Spent',  `${Math.round(totalSpent)} pts`,                     'text-amber-600',   'glass-card-red'],
           ].map(([l,v,c,cls])=>(
             <div key={l} className={`${cls} rounded-2xl p-4 text-center`}>
               <div className={`font-orbitron text-lg font-bold ${c}`}>{v}</div>
@@ -228,7 +228,7 @@ export default function Teams() {
                     ✏️ Edit
                   </button>
                   <button onClick={()=>handleDelete(t._id)}
-                    className="flex-1 py-2 text-xs text-red-400 hover:text-red-600 border border-slate-200 hover:border-red-300 rounded-xl transition-all font-raj font-semibold glass-card hover:bg-red-50">
+                    className="flex-1 py-2 text-xs text-amber-400 hover:text-amber-600 border border-slate-200 hover:border-amber-300 rounded-xl transition-all font-raj font-semibold glass-card hover:bg-amber-50">
                     🗑 Remove
                   </button>
                 </div>

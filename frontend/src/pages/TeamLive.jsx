@@ -241,7 +241,7 @@ export default function TeamLive() {
   // ── Loading / Error ─────────────────────────────────────────────────────
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4"
-      style={{ background: 'linear-gradient(135deg,#0f172a,#1e1b4b)' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D,#121829)' }}>
       <div className="text-6xl animate-bounce">🏏</div>
       <p className="text-white/50 font-raj tracking-widest text-sm animate-pulse">Loading live auction…</p>
     </div>
@@ -249,7 +249,7 @@ export default function TeamLive() {
 
   if (error) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6"
-      style={{ background: 'linear-gradient(135deg,#0f172a,#1e1b4b)' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D,#121829)' }}>
       <div className="text-6xl">❌</div>
       <h2 className="text-white font-display text-2xl">Not Found</h2>
       <p className="text-white/50 text-sm text-center">{error}</p>
@@ -267,29 +267,29 @@ export default function TeamLive() {
           onChange={e => setCode(e.target.value.toUpperCase())}
           placeholder="Enter your team code"
           maxLength={6}
-          className="flex-1 min-w-[160px] bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-center tracking-[0.3em] font-display outline-none focus:border-red-500"
+          className="flex-1 min-w-[160px] bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-center tracking-[0.3em] font-display outline-none focus:border-amber-500"
         />
-        <button disabled={unlocking} className="bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl px-5 py-2.5 font-display tracking-wide">
+        <button disabled={unlocking} className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 rounded-xl px-5 py-2.5 font-display tracking-wide">
           {unlocking ? '…' : 'Unlock'}
         </button>
       </div>
-      {unlockErr && <p className="text-red-400 text-xs">{unlockErr}</p>}
+      {unlockErr && <p className="text-amber-400 text-xs">{unlockErr}</p>}
     </form>
   );
 
   return (
     <div className="min-h-screen text-white"
-      style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e1b4b 55%,#0f172a 100%)', fontFamily: 'sans-serif' }}>
+      style={{ background: 'linear-gradient(135deg,#0A0F1D 0%,#121829 55%,#0A0F1D 100%)', fontFamily: "'Inter', sans-serif" }}>
 
       {/* ── Top bar ────────────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-30 border-b border-white/10 backdrop-blur-xl"
-        style={{ background: 'rgba(15,23,42,0.85)' }}>
+        style={{ background: 'rgba(10,15,29,0.85)' }}>
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center font-display text-lg"
-              style={{ background: 'linear-gradient(135deg,#dc2626,#1d4ed8)' }}>C</div>
+              style={{ background: 'linear-gradient(135deg,#FBBF24,#F59E0B)' }}>C</div>
             <div>
-              <div className="font-display text-xl leading-none">CRIC<span className="text-red-500">ZAAR</span></div>
+              <div className="font-display text-xl leading-none">CRIC<span className="text-amber-500">ZAAR</span></div>
               <div className="text-[10px] text-white/30 tracking-widest">TEAM BIDDING</div>
             </div>
           </div>
@@ -305,8 +305,8 @@ export default function TeamLive() {
                 🏆 COMPLETED
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/>● LIVE
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"/>● LIVE
               </span>
             )}
             {myTeam && (
@@ -330,7 +330,7 @@ export default function TeamLive() {
             ['🏏', totalCount,     'Total',     '#94a3b8'],
             ['✅', soldCount,      'Sold',       '#10b981'],
             ['❌', unsoldCount,    'Unsold',     '#ef4444'],
-            ['⏳', remainingCount, 'Remaining',  '#60a5fa'],
+            ['⏳', remainingCount, 'Remaining',  '#38BDF8'],
           ].map(([em, v, l, c]) => (
             <div key={l} className="rounded-2xl p-3 text-center border border-white/8"
               style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)' }}>
@@ -372,14 +372,14 @@ export default function TeamLive() {
         {currentPlayer ? (
           <div className="rounded-3xl border border-white/10 overflow-hidden"
             style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)' }}>
-            <div className="h-1" style={{ background: 'linear-gradient(90deg,#dc2626,#1d4ed8,#dc2626)', backgroundSize: '200%', animation: 'shimmer 2s linear infinite' }}/>
+            <div className="h-1" style={{ background: 'linear-gradient(90deg,#F59E0B,#6366F1,#F59E0B)', backgroundSize: '200%', animation: 'shimmer 2s linear infinite' }}/>
             <div className="p-6">
               <div className="flex items-start gap-5 flex-wrap sm:flex-nowrap">
                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-white/20 flex-shrink-0 mx-auto sm:mx-0">
                   {currentPlayer.photo
                     ? <img src={currentPlayer.photo} alt={currentPlayer.name} className="w-full h-full object-cover"/>
                     : <div className="w-full h-full flex items-center justify-center font-display text-4xl"
-                        style={{ background: 'linear-gradient(135deg,#dc2626,#1d4ed8)' }}>
+                        style={{ background: 'linear-gradient(135deg,#FBBF24,#F59E0B)' }}>
                         {currentPlayer.name?.[0]}
                       </div>}
                 </div>
@@ -411,7 +411,7 @@ export default function TeamLive() {
                     {room?.rules?.maxPlayerPrice ? (
                       <div>
                         <div className="text-xs text-white/40 uppercase tracking-widest">Max/Player Cap</div>
-                        <div className="font-orbitron text-sm text-red-400">{room.rules.maxPlayerPrice} pts</div>
+                        <div className="font-orbitron text-sm text-amber-400">{room.rules.maxPlayerPrice} pts</div>
                       </div>
                     ) : null}
                   </div>
@@ -438,7 +438,7 @@ export default function TeamLive() {
                 </button>
               )}
               {myTeam && !canBid && !isPaused && (
-                <div className="text-red-400 text-xs text-center mt-2">Not enough budget left for another bid</div>
+                <div className="text-amber-400 text-xs text-center mt-2">Not enough budget left for another bid</div>
               )}
             </div>
           </div>
@@ -476,7 +476,7 @@ export default function TeamLive() {
             <button key={k} onClick={() => setActiveTab(k)}
               className={`px-4 py-2.5 text-sm font-bold transition-all rounded-t-xl border-b-2 ${
                 activeTab === k
-                  ? 'text-white border-red-500'
+                  ? 'text-white border-amber-500'
                   : 'text-white/40 border-transparent hover:text-white/70'
               }`}>
               {l}
@@ -503,14 +503,14 @@ export default function TeamLive() {
               const isMine = myTeam && team._id === myTeam.teamId;
               return (
                 <div key={team._id} className="rounded-2xl overflow-hidden border"
-                  style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)', borderColor: isMine ? (team.color || '#dc2626') : 'rgba(255,255,255,0.08)' }}>
-                  <div className="h-1" style={{ background: `linear-gradient(90deg,${team.color || '#dc2626'},rgba(29,78,216,0.6))` }}/>
+                  style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)', borderColor: isMine ? (team.color || '#F59E0B') : 'rgba(255,255,255,0.08)' }}>
+                  <div className="h-1" style={{ background: `linear-gradient(90deg,${team.color || '#F59E0B'},rgba(99,102,241,0.6))` }}/>
                   <div className="p-5">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-11 h-11 rounded-full overflow-hidden border-2 flex-shrink-0" style={{ borderColor: team.color || '#dc2626' }}>
+                      <div className="w-11 h-11 rounded-full overflow-hidden border-2 flex-shrink-0" style={{ borderColor: team.color || '#F59E0B' }}>
                         {team.logo
                           ? <img src={team.logo} alt={team.name} className="w-full h-full object-cover"/>
-                          : <div className="w-full h-full flex items-center justify-center font-display text-xl text-white" style={{ background: team.color || '#dc2626' }}>{team.name?.[0]}</div>}
+                          : <div className="w-full h-full flex items-center justify-center font-display text-xl text-white" style={{ background: team.color || '#F59E0B' }}>{team.name?.[0]}</div>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-display text-lg text-white truncate flex items-center gap-2">
@@ -520,7 +520,7 @@ export default function TeamLive() {
                       </div>
                     </div>
                     <div className="w-full bg-white/10 rounded-full h-1.5 mb-3 overflow-hidden">
-                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: 'linear-gradient(90deg,#dc2626,#1d4ed8)' }}/>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: 'linear-gradient(90deg,#F59E0B,#6366F1)' }}/>
                     </div>
                     <div className="flex justify-between items-center mb-3">
                       <div>
@@ -544,7 +544,7 @@ export default function TeamLive() {
                             <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/10">
                               {p.photo
                                 ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover"/>
-                                : <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ background: team.color || '#1d4ed8', color:'#fff' }}>{p.name?.[0]}</div>}
+                                : <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ background: team.color || '#6366F1', color:'#fff' }}>{p.name?.[0]}</div>}
                             </div>
                             <span className="flex-1 text-white/80 truncate">{p.name}</span>
                             {p.isRetained && <span className="text-xs text-blue-400 flex-shrink-0">🔒</span>}
@@ -554,7 +554,7 @@ export default function TeamLive() {
                     </div>
                     <div className="flex gap-0.5 mt-3">
                       {Array.from({ length: team.slots || 11 }).map((_, i) => (
-                        <div key={i} className="flex-1 h-1 rounded-sm" style={{ background: i < tp.length ? (team.color || '#dc2626') : 'rgba(255,255,255,0.1)' }}/>
+                        <div key={i} className="flex-1 h-1 rounded-sm" style={{ background: i < tp.length ? (team.color || '#F59E0B') : 'rgba(255,255,255,0.1)' }}/>
                       ))}
                     </div>
                     <div className="text-[10px] text-white/25 mt-1">{tp.length}/{team.slots || 11} slots</div>
@@ -572,7 +572,7 @@ export default function TeamLive() {
               const list = players.filter(p => p.status === status || (status === 'sold' && p.isRetained));
               if (list.length === 0) return null;
               const label = { remaining:'⏳ Remaining', sold:'✅ Sold', unsold:'❌ Unsold', retained:'🔒 Retained' }[status];
-              const color = { remaining:'#60a5fa', sold:'#10b981', unsold:'#ef4444', retained:'#818cf8' }[status];
+              const color = { remaining:'#38BDF8', sold:'#10b981', unsold:'#ef4444', retained:'#818cf8' }[status];
               return (
                 <div key={status}>
                   <div className="text-xs font-orbitron uppercase tracking-widest mb-2 mt-4" style={{ color }}>{label} ({list.length})</div>
@@ -615,7 +615,7 @@ export default function TeamLive() {
             {log.length === 0
               ? <div className="text-white/20 text-center py-12 text-sm">No activity yet</div>
               : log.map((entry, i) => {
-                const color = { bid:'#f59e0b', sold:'#10b981', unsold:'#ef4444', info:'#94a3b8', pause:'#f59e0b', resume:'#60a5fa', retain:'#818cf8' }[entry.type] || '#94a3b8';
+                const color = { bid:'#f59e0b', sold:'#10b981', unsold:'#ef4444', info:'#94a3b8', pause:'#f59e0b', resume:'#38BDF8', retain:'#818cf8' }[entry.type] || '#94a3b8';
                 return (
                   <div key={entry._key || i} className="flex items-start gap-3 px-4 py-2.5 rounded-xl border border-white/5"
                     style={{ background: 'rgba(255,255,255,0.03)' }}>

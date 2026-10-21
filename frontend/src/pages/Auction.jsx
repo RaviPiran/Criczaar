@@ -14,7 +14,7 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
   const segments  = remaining.length > 0 ? remaining : [];
   const count     = segments.length || 6; // fallback for display
 
-  const COLORS = ['#dc2626','#1d4ed8','#059669','#d97706','#7c3aed','#db2777','#0891b2','#65a30d','#ea580c','#6366f1'];
+  const COLORS = ['#F59E0B','#6366F1','#38BDF8','#10B981','#F87171','#A78BFA','#FB923C','#34D399','#FBBF24','#818CF8'];
 
   const [rotation, setRotation]     = useState(0);
   const [spinning, setSpinning]     = useState(false);
@@ -91,9 +91,9 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
   const shouldShowPickUnsold = round2Ready || (remaining.length === 0 && unsoldPlayers.length > 0 && !isCompleted);
 
   if (shouldShowPickUnsold) return (
-    <div className="flex-shrink-0 flex flex-col items-center justify-center gap-5 rounded-3xl border-2 border-dashed bg-white p-10 text-center"
+    <div className="flex-shrink-0 flex flex-col items-center justify-center gap-5 rounded-3xl border-2 border-dashed bg-white p-10 text-center animate-rise"
       style={{borderColor:'rgba(234,179,8,0.5)'}}>
-      <div className="text-6xl">✅</div>
+      <div className="text-6xl animate-float">✅</div>
       <div>
         <p className="font-display text-2xl tracking-wide text-slate-800">Round 1 Complete!</p>
         <p className="text-slate-500 text-sm mt-1">
@@ -108,7 +108,7 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
           📋 Pick Unsold Players
         </button>
         <button className="px-8 py-3 rounded-xl font-display tracking-widest text-white font-bold text-base transition-all hover:-translate-y-0.5 disabled:opacity-40"
-          style={{background:'linear-gradient(135deg,#dc2626,#b91c1c)'}}
+          style={{background:'linear-gradient(135deg,#F59E0B,#D97706)'}}
           onClick={onCompleteAuction} disabled={loading}>
           🏆 Complete Auction
         </button>
@@ -118,8 +118,8 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
 
   /* ── Completed state ── */
   if (isCompleted) return (
-    <div className="flex-shrink-0 flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-slate-300 bg-white p-14 text-center">
-      <div className="text-5xl">🏆</div>
+    <div className="flex-shrink-0 flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-slate-300 bg-white p-14 text-center animate-rise">
+      <div className="text-5xl animate-float">🏆</div>
       <p className="font-display text-xl tracking-wide text-slate-700">Auction Complete!</p>
       <button className="btn-primary px-8 py-2.5" onClick={onResults}>View Results</button>
     </div>
@@ -127,26 +127,36 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
 
   /* ── Normal spin wheel ── */
   return (
-    <div className="flex-shrink-0 flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-slate-200 bg-white py-8 px-4">
-      <p className="font-display text-lg tracking-widest" style={{color:'#1d4ed8'}}>
-        🏏 SPIN TO PICK NEXT PLAYER
+    <div className="relative overflow-hidden flex-shrink-0 flex flex-col items-center justify-center gap-4 rounded-3xl border border-white/10 py-8 px-4 animate-rise"
+      style={{background:'linear-gradient(160deg,rgba(23,30,51,0.95),rgba(18,24,41,0.92))', boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}}>
+      <div className="absolute -top-20 -left-16 w-72 h-72 rounded-full pointer-events-none animate-drift"
+        style={{background:'radial-gradient(circle,rgba(245,158,11,0.16),transparent 70%)'}}/>
+      <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full pointer-events-none animate-drift"
+        style={{background:'radial-gradient(circle,rgba(99,102,241,0.20),transparent 70%)', animationDelay:'-9s'}}/>
+      <div className="absolute inset-0 dot-grid opacity-50 pointer-events-none"/>
+      <span className="relative inline-flex items-center gap-2 px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-[0.18em] uppercase"
+        style={{background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.35)', color:'#FBBF24'}}>
+        <span className={`w-1.5 h-1.5 rounded-full bg-amber-400 ${spinning ? 'live-dot' : ''}`}/>
+        {spinning ? 'Drawing…' : 'Player Draw'}
+      </span>
+      <p className="relative font-display text-2xl tracking-widest text-gradient">
+        Spin to pick next player
       </p>
 
       {/* Wheel + pointer */}
       <div className="relative flex items-center justify-center" style={{width: size}}>
         {/* Pointer arrow — TOP centre, pointing DOWN into wheel */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10" style={{filter:'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}}>
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 z-10 ${spinning ? 'pointer-tick' : ''}`} style={{filter:'drop-shadow(0 0 8px rgba(245,158,11,0.7))'}}>
           <svg width="24" height="32" viewBox="0 0 24 32">
-            <polygon points="12,32 0,0 12,6 24,0" fill="#dc2626"/>
+            <polygon points="12,32 0,0 12,6 24,0" fill="#F59E0B"/>
           </svg>
         </div>
 
         {/* SVG Wheel */}
-        <div style={{
+        <div className={spinning ? 'wheel-glow' : 'wheel-idle'} style={{
           transform: `rotate(${rotation}deg)`,
           transition: spinning ? 'transform 4.2s cubic-bezier(0.17,0.67,0.12,1)' : 'none',
           borderRadius: '50%',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
         }}>
           <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             {segments.map((seg, i) => {
@@ -159,22 +169,24 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
               const short    = name.length > 10 ? name.slice(0, 9) + '…' : name;
               return (
                 <g key={i}>
-                  <path d={makeSlicePath(i)} fill={COLORS[i % COLORS.length]} stroke="#fff" strokeWidth="2"/>
+                  <path d={makeSlicePath(i)} fill={COLORS[i % COLORS.length]} stroke="#0A0F1D" strokeWidth="2"/>
                   <text
                     x={tx} y={ty}
                     textAnchor="middle" dominantBaseline="middle"
                     transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
-                    fill="#fff" fontSize="11" fontWeight="bold"
-                    fontFamily="Rajdhani, sans-serif"
+                    fill={["#6366F1","#818CF8","#A78BFA"].includes(COLORS[i % COLORS.length]) ? "#fff" : "#0A0F1D"} fontSize="11" fontWeight="bold"
+                    fontFamily="Inter, sans-serif"
                     style={{pointerEvents:'none'}}>
                     {short}
                   </text>
                 </g>
               );
             })}
+            {/* Rim */}
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(245,158,11,0.55)" strokeWidth="3"/>
             {/* Centre hub */}
-            <circle cx={cx} cy={cy} r={18} fill="#fff" stroke="#e2e8f0" strokeWidth="3"/>
-            <circle cx={cx} cy={cy} r={10} fill="#1d4ed8"/>
+            <circle cx={cx} cy={cy} r={18} fill="#121829" stroke="#F59E0B" strokeWidth="3"/>
+            <circle cx={cx} cy={cy} r={10} fill="#6366F1"/>
           </svg>
         </div>
       </div>
@@ -184,27 +196,139 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
         <button
           onClick={handleSpin}
           disabled={spinning || landed}
-          className="px-8 py-3 rounded-xl font-display tracking-widest text-white font-bold text-base transition-all hover:-translate-y-0.5 disabled:opacity-40"
-          style={{background: landed ? '#94a3b8' : 'linear-gradient(135deg,#dc2626,#b91c1c)'}}>
+          className={`bid-btn relative px-8 py-3 rounded-xl font-display tracking-widest font-bold text-base transition-all hover:-translate-y-0.5 disabled:opacity-40 ${!spinning && !landed ? 'animate-glow-pulse' : ''}`}
+          style={{background: landed ? '#2E3A5C' : 'linear-gradient(135deg,#FBBF24,#F59E0B)', color: landed ? '#fff' : '#0A0F1D'}}>
           {spinning ? '🌀 Spinning…' : landed ? '✅ Spun!' : '🎰 SPIN!'}
         </button>
         {landed && (
           <button
             onClick={() => landedPlayer && onSpin(landedPlayer._id)}
             className="px-8 py-3 rounded-xl font-display tracking-widest text-white font-bold text-base transition-all hover:-translate-y-0.5"
-            style={{background:'linear-gradient(135deg,#059669,#0d9488)'}}>
+            style={{background:'linear-gradient(135deg,#059669,#38BDF8)'}}>
             🏏 Load {landedPlayer ? landedPlayer.name : 'Player'}
           </button>
         )}
       </div>
       {landed && landedPlayer && (
-        <p className="text-sm font-bold mt-1" style={{color:'#059669'}}>🎯 Landed on: {landedPlayer.name}</p>
+        <p key={landedPlayer._id} className="relative text-sm font-bold mt-1 animate-pop" style={{color:'#34D399'}}>🎯 Landed on: {landedPlayer.name}</p>
       )}
       <p className="text-xs text-slate-400 font-raj">Spin the wheel, then load the player!</p>
     </div>
   );
 }
 
+
+/* ── "NEXT UP" reveal shown while the next player loads ─────────── */
+const NEXTUP_CSS = `
+@property --nu-ang { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+@keyframes nuSpin  { to { --nu-ang:360deg; } }
+@keyframes nuBack  { from{opacity:0} to{opacity:1} }
+@keyframes nuRing  { 0%{transform:scale(.3);opacity:.8} 100%{transform:scale(2.6);opacity:0} }
+@keyframes nuTitle { 0%{opacity:0;letter-spacing:.9em;transform:scale(1.35)} 100%{opacity:1;letter-spacing:.26em;transform:none} }
+@keyframes nuCard  { 0%{opacity:0;transform:translateY(70px) scale(.8)} 100%{opacity:1;transform:none} }
+@keyframes nuAvatar{ 0%{transform:scale(0) rotate(-90deg)} 70%{transform:scale(1.1) rotate(6deg)} 100%{transform:none} }
+@keyframes nuWipeL { from{transform:translateX(-110%)} to{transform:translateX(0)} }
+@keyframes nuWipeR { from{transform:translateX(110%)}  to{transform:translateX(0)} }
+@keyframes nuUp    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+@keyframes nuBat   { 0%,100%{transform:rotate(-40deg)} 50%{transform:rotate(28deg)} }
+@keyframes nuDot   { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+@keyframes nuFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+`;
+
+const PersonIcon = ({ size = 64, color = '#8591B0' }) => (
+  <svg width={size} height={size} viewBox="0 0 120 120" fill={color} style={{ display:'block' }}>
+    <circle cx="60" cy="40" r="22"/>
+    <path d="M12 120c0-30 21-50 48-50s48 20 48 50z"/>
+  </svg>
+);
+
+function NextUpOverlay({ player }) {
+  return (
+    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center gap-5 overflow-hidden"
+      style={{
+        background:'radial-gradient(circle at 50% 42%,rgba(99,102,241,0.30),transparent 55%),radial-gradient(circle at 50% 105%,rgba(245,158,11,0.28),transparent 55%),rgba(10,15,29,0.94)',
+        backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', animation:'nuBack .25s ease',
+      }}>
+      <style>{NEXTUP_CSS}</style>
+
+      {/* expanding rings */}
+      {[0, 0.4, 0.8].map(d => (
+        <span key={d} className="absolute rounded-full pointer-events-none"
+          style={{ width:300, height:300, border:'2px solid rgba(245,158,11,0.5)', animation:`nuRing 2s ${d}s ease-out infinite` }}/>
+      ))}
+
+      {/* sliding light bars */}
+      <div className="absolute left-0 top-[16%] h-[2px] w-1/2 pointer-events-none"
+        style={{ background:'linear-gradient(90deg,transparent,#F59E0B)', animation:'nuWipeL .6s cubic-bezier(.22,1,.36,1)' }}/>
+      <div className="absolute right-0 top-[16%] h-[2px] w-1/2 pointer-events-none"
+        style={{ background:'linear-gradient(270deg,transparent,#38BDF8)', animation:'nuWipeR .6s .1s cubic-bezier(.22,1,.36,1) backwards' }}/>
+      <div className="absolute left-0 bottom-[16%] h-[2px] w-1/2 pointer-events-none"
+        style={{ background:'linear-gradient(90deg,transparent,#6366F1)', animation:'nuWipeL .6s .2s cubic-bezier(.22,1,.36,1) backwards' }}/>
+      <div className="absolute right-0 bottom-[16%] h-[2px] w-1/2 pointer-events-none"
+        style={{ background:'linear-gradient(270deg,transparent,#F59E0B)', animation:'nuWipeR .6s .3s cubic-bezier(.22,1,.36,1) backwards' }}/>
+
+      <div className="relative text-6xl" style={{ transformOrigin:'bottom center', animation:'nuBat .8s ease-in-out infinite' }}>🏏</div>
+
+      <div className="relative font-display font-extrabold text-center"
+        style={{ fontSize:'clamp(40px,8vw,84px)', lineHeight:1, animation:'nuTitle .40s cubic-bezier(.22,1,.36,1) backwards' }}>
+        <span className="text-gradient">NEXT UP</span>
+      </div>
+
+      {/* player reveal card */}
+      <div className="relative flex flex-col items-center gap-3 px-12 py-7 rounded-3xl border"
+        style={{
+          background:'rgba(18,24,41,0.82)', borderColor:'rgba(255,255,255,0.10)',
+          boxShadow:'0 24px 70px rgba(0,0,0,0.55), 0 0 60px rgba(245,158,11,0.12)',
+          animation:'nuCard .75s .25s cubic-bezier(.22,1,.36,1) backwards', minWidth:300,
+        }}>
+        {/* avatar with rotating ring */}
+        <div className="relative" style={{ width:136, height:136, animation:'nuAvatar .8s .45s cubic-bezier(.34,1.56,.64,1) backwards' }}>
+          <div className="absolute rounded-full" style={{
+            inset:-5, background:'conic-gradient(from var(--nu-ang),#F59E0B,#38BDF8,#6366F1,#F59E0B)',
+            animation:'nuSpin 3s linear infinite', boxShadow:'0 0 34px rgba(245,158,11,0.45)' }}/>
+          <div className="absolute inset-0 rounded-full overflow-hidden flex items-end justify-center"
+            style={{ background:'linear-gradient(160deg,#171E33,#0A0F1D)' }}>
+            {player?.photo
+              ? <img src={player.photo} alt={player.name} className="w-full h-full object-cover"/>
+              : <img src={`${process.env.PUBLIC_URL || ''}/non-profile.png`} alt="Player"
+                  className="w-full h-full object-cover" draggable={false}
+                  style={{ objectPosition:'center 18%', transform:'scale(1.12)', animation: player ? 'nuFloat 3s ease-in-out infinite' : 'none',
+                           opacity: player ? 1 : 0.45, filter: player ? 'none' : 'grayscale(1)' }}/>}
+          </div>
+        </div>
+
+        {player ? (
+          <>
+            <div className="font-display font-extrabold text-white text-center"
+              style={{ fontSize:34, lineHeight:1.05, letterSpacing:1, animation:'nuUp .5s .7s cubic-bezier(.22,1,.36,1) backwards' }}>
+              {player.name}
+            </div>
+            <div className="flex items-center gap-2 flex-wrap justify-center" style={{ animation:'nuUp .5s .85s cubic-bezier(.22,1,.36,1) backwards' }}>
+              {player.role && (
+                <span className="px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-[0.18em] uppercase"
+                  style={{ background:'rgba(99,102,241,0.18)', border:'1px solid rgba(99,102,241,0.5)', color:'#A5B4FC' }}>
+                  {player.role}
+                </span>
+              )}
+              {player.club && (
+                <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-white/45">{player.club}</span>
+              )}
+            </div>
+            <div className="font-mono font-bold" style={{ color:'#F59E0B', fontSize:22, textShadow:'0 0 22px rgba(245,158,11,0.55)', animation:'nuUp .5s 1s cubic-bezier(.22,1,.36,1) backwards' }}>
+              <span className="text-[10px] tracking-[0.2em] text-white/40 mr-2 font-medium">BASE</span>
+              {player.basePrice || 0} <span className="text-xs opacity-70">pts</span>
+            </div>
+          </>
+        ) : (
+          <div className="font-mono text-sm tracking-[0.25em] uppercase text-white/55" style={{ animation:'nuUp .5s .7s backwards' }}>
+            Drawing player
+            {[0, 1, 2].map(i => <span key={i} style={{ animation:`nuDot 1.2s ${i * .2}s infinite` }}>.</span>)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Auction() {
   const navigate = useNavigate();
@@ -214,6 +338,7 @@ export default function Auction() {
   const [timerSecs, setTimerSecs]       = useState(30);
   const [soldResult, setSoldResult]     = useState(null);
   const [showSwing, setShowSwing]       = useState(false);
+  const [nextUp, setNextUp]               = useState(null);   // player shown in the NEXT UP reveal
   const [showWheel, setShowWheel]       = useState(true);  // show wheel before first player too
   const [pickModal, setPickModal]       = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -286,6 +411,7 @@ export default function Auction() {
 
   const handleNext = async (playerId) => {
     if (loading || isPaused) return;
+    setNextUp(playerId ? (players.find(p => p._id === playerId) || null) : null);
     setShowSwing(true); stopLocalTimer();
     setTimeout(async () => {
       try {
@@ -322,7 +448,7 @@ export default function Auction() {
         }
       } catch(err) { toast.error(err.response?.data?.message || 'Failed'); }
       setShowSwing(false);
-    }, 1100);
+    }, 1900);
   };
 
   const handleStartRound2 = async () => {
@@ -393,9 +519,9 @@ export default function Auction() {
         result: {
           type:'sold',
           player:{ _id:assignedId, name:assignedName, photo:pickUnsoldPlayer_.photo },
-          team:{ _id:assignedTeam, name:assignedTeamObj?.name||'', color:assignedTeamObj?.color||'#dc2626', logo:assignedTeamObj?.logo||'' },
+          team:{ _id:assignedTeam, name:assignedTeamObj?.name||'', color:assignedTeamObj?.color||'#F59E0B', logo:assignedTeamObj?.logo||'' },
           playerName:assignedName, playerPhoto:pickUnsoldPlayer_.photo,
-          teamName:assignedTeamObj?.name||'', teamColor:assignedTeamObj?.color||'#dc2626',
+          teamName:assignedTeamObj?.name||'', teamColor:assignedTeamObj?.color||'#F59E0B',
           teamLogo:assignedTeamObj?.logo||'', price, bonusPoints:0, isUnsold:false,
         },
       });
@@ -482,9 +608,9 @@ export default function Auction() {
       const result = {
         type:'sold',
         player:{ _id:currentPlayer._id, name:currentPlayer.name, photo:currentPlayer.photo },
-        team:{ _id:selectedTeam, name:team?.name||'', color:team?.color||'#dc2626', logo:team?.logo||'' },
+        team:{ _id:selectedTeam, name:team?.name||'', color:team?.color||'#F59E0B', logo:team?.logo||'' },
         playerName:currentPlayer.name, playerPhoto:currentPlayer.photo,
-        teamName:team?.name||'', teamColor:team?.color||'#dc2626',
+        teamName:team?.name||'', teamColor:team?.color||'#F59E0B',
         teamLogo:team?.logo||'', price:currentBid,
         bonusPoints:data.data.bonusPoints||0, isUnsold:false,
       };
@@ -539,8 +665,8 @@ export default function Auction() {
 
         {/* Pause banner */}
         {isPaused && (
-          <div className="rounded-2xl px-6 py-3 text-center font-display text-lg tracking-widest animate-pulse-slow flex-shrink-0 border-2"
-            style={{background:'rgba(234,179,8,0.1)', borderColor:'#eab308', color:'#854d0e'}}>
+          <div className="rounded-2xl px-6 py-3 text-center font-display text-lg tracking-widest pause-stripes flex-shrink-0 border-2"
+            style={{background:'rgba(234,179,8,0.1)', borderColor:'#FBBF24', color:'#FBBF24'}}>
             ⏸ AUCTION PAUSED — Click RESUME to continue
           </div>
         )}
@@ -563,31 +689,65 @@ export default function Auction() {
             <div className="w-[700px] flex-shrink-0">
               <PlayerProfileCard player={currentPlayer} size="large"/>
             </div>
-            {/* Current Bid + Timer panel */}
-            <div className="flex-1 glass-card rounded-2xl p-5 flex items-center gap-10 flex-wrap min-w-[200px]">
-              <div>
-                <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-1">Current Bid</div>
-                <div className="font-orbitron font-black text-5xl leading-none" style={{color:'#dc2626'}}>
-                  {Math.round(currentBid)}<span className="text-2xl ml-1" style={{color:'#fca5a5'}}> pts</span>
+            {/* Current Bid + Timer panel — arena look */}
+            <div className="flex-1 arena-panel p-6 flex flex-col justify-between gap-5 min-w-[260px] overflow-hidden">
+              <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none animate-drift"
+                style={{background:'radial-gradient(circle,rgba(245,158,11,0.18),transparent 70%)'}}/>
+              <div className="absolute -bottom-20 -left-10 w-52 h-52 rounded-full pointer-events-none animate-drift"
+                style={{background:'radial-gradient(circle,rgba(99,102,241,0.18),transparent 70%)', animationDelay:'-8s'}}/>
+
+              <div className="relative flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-[0.18em] uppercase"
+                  style={{background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.35)', color:'#FBBF24'}}>
+                  <span className={`w-1.5 h-1.5 rounded-full bg-amber-400 ${isPaused ? '' : 'live-dot'}`}/>
+                  {isPaused ? 'Paused' : 'Live Bidding'}
+                </span>
+                <span className="font-mono text-[10px] tracking-widest uppercase text-white/40 px-2.5 py-1 rounded-md border border-white/10">
+                  Lot #{sold + unsold + 1}
+                </span>
+              </div>
+
+              <div className="relative">
+                <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/40 mb-2">Current Highest Bid</div>
+                <div className="relative inline-block">
+                  {/* ripple + number re-mount on every new bid → pop animation */}
+                  <span key={`rp-${currentBid}`} className="bid-ripple absolute left-1/2 top-1/2 w-24 h-24 -ml-12 -mt-12 rounded-full pointer-events-none"
+                    style={{border:'2px solid rgba(245,158,11,0.6)'}}/>
+                  <div key={currentBid} className="bid-pop font-mono font-black text-6xl leading-none"
+                    style={{color:'#F59E0B', textShadow:'0 0 28px rgba(245,158,11,0.45)'}}>
+                    {Math.round(currentBid)}<span className="text-xl ml-2 text-white/40 font-bold"> pts</span>
+                  </div>
                 </div>
-                <div className="text-sm text-slate-500 mt-1">
-                  {winningTeam
-                    ? <span className="font-bold" style={{color:winningTeam.color}}>🏆 {winningTeam.name} is leading</span>
-                    : 'No bid yet — base price'}
+
+                <div className="mt-4 min-h-[30px]">
+                  {winningTeam ? (
+                    <span key={winningTeam._id} className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold animate-rise"
+                      style={{background:'rgba(255,255,255,0.05)', border:`1px solid ${winningTeam.color}`, color:winningTeam.color}}>
+                      <span className="w-2 h-2 rounded-full live-dot" style={{background:winningTeam.color}}/>
+                      🏆 {winningTeam.name}
+                      <span className="font-mono text-[9px] opacity-70 tracking-[0.18em]">HOLDING BID</span>
+                    </span>
+                  ) : (
+                    <span className="text-sm text-white/40">No bid yet — base price</span>
+                  )}
+                </div>
+                <div className="font-mono text-[11px] text-white/35 mt-2 tracking-wider">
+                  NEXT BID <span className="text-white/75 font-bold">{Math.round(currentBid + getNextIncrement(currentBid))}</span> PTS
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+
+              <div className="relative flex items-center gap-5 flex-wrap">
                 <TimerRing seconds={timerSecs} maxSeconds={maxTimer}/>
-                <div className="hidden sm:block">
-                  <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-2">Progress</div>
-                  <div className="w-32">
-                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-1">
-                      <div className="h-full rounded-full transition-all"
-                        style={{width:`${pct}%`, background:'linear-gradient(90deg,#dc2626,#1d4ed8)'}}/>
-                    </div>
-                    <div className="flex gap-2 text-[10px] text-slate-400 font-orbitron">
-                      <span>✅{sold}</span><span>❌{unsold}</span><span>⏳{remain}</span>
-                    </div>
+                <div className="flex-1 min-w-[140px]">
+                  <div className="flex justify-between font-mono text-[10px] tracking-[0.18em] uppercase text-white/40 mb-1.5">
+                    <span>Auction Progress</span><span className="text-white/70">{Math.round(pct)}%</span>
+                  </div>
+                  <div className="w-full rounded-full h-2 overflow-hidden" style={{background:'rgba(255,255,255,0.07)'}}>
+                    <div className="h-full rounded-full"
+                      style={{width:`${pct}%`, background:'linear-gradient(90deg,#F59E0B,#38BDF8,#6366F1)', transition:'width 1s cubic-bezier(.22,1,.36,1)'}}/>
+                  </div>
+                  <div className="flex gap-3 mt-2 font-mono text-[10px] text-white/45">
+                    <span>✅ {sold}</span><span>❌ {unsold}</span><span>⏳ {remain}</span>
                   </div>
                 </div>
               </div>
@@ -599,7 +759,7 @@ export default function Auction() {
         <div className="flex-shrink-0 glass-card rounded-2xl p-4">
           <div className="text-xs text-slate-400 font-orbitron tracking-widest uppercase mb-3 px-1">🛡 Teams — Click to Bid</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {teams.map(t => {
+            {teams.map((t, ti) => {
               const isWin      = (currentBidder?._id || currentBidder?.id || currentBidder) === t._id;
               const slotsLeft  = t.slots - (t.players?.length || 0);
               const maxBid     = getMaxBid(t);
@@ -610,10 +770,15 @@ export default function Auction() {
 
               return (
                 <div key={t._id}
-                  className={`rounded-2xl border transition-all overflow-hidden ${isWin ? 'border-emerald-300 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'}`}
-                  style={isWin ? {background:'rgba(5,150,105,0.04)'} : {}}>
+                  className={`relative rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${isWin ? 'lead-glow border-amber-500' : 'border-white/10 hover:border-white/25'}`}
+                  style={{
+                    background: isWin ? 'linear-gradient(160deg,rgba(245,158,11,0.12),rgba(18,24,41,0.92))' : 'rgba(18,24,41,0.85)',
+                    animation: 'riseIn .55s cubic-bezier(.22,1,.36,1) backwards',
+                    animationDelay: `${ti * 50}ms`,
+                  }}>
+                  {isWin && <span key={`fl-${currentBid}`} className="bid-flash"/>}
 
-                  <div className="h-1.5 w-full" style={{background: isWin ? 'linear-gradient(90deg,#dc2626,#b91c1c)' : t.color}}/>
+                  <div className="h-1.5 w-full" style={{background: isWin ? 'linear-gradient(90deg,#F59E0B,#D97706)' : t.color}}/>
 
                   <div className="p-3">
                     {/* Header row */}
@@ -629,14 +794,14 @@ export default function Auction() {
                           <div className="flex gap-0.5">
                             {Array.from({length: t.slots}).map((_,i) => (
                               <div key={i} className="w-2 h-2 rounded-sm"
-                                style={{background: i < (t.players?.length||0) ? t.color : '#e2e8f0'}}/>
+                                style={{background: i < (t.players?.length||0) ? t.color : '#222B45'}}/>
                             ))}
                           </div>
                           <span className="text-[10px] text-slate-400 font-raj">{t.players?.length||0}/{t.slots}</span>
                         </div>
                       </div>
                       {isWin && (
-                        <span className="text-[10px] font-black text-emerald-600 border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 rounded-full flex-shrink-0 tracking-wide">LEAD</span>
+                        <span className="font-mono text-[9px] font-black text-amber-400 border border-amber-500/50 bg-amber-500/10 px-1.5 py-0.5 rounded-full flex-shrink-0 tracking-widest animate-pop">LEAD</span>
                       )}
                     </div>
 
@@ -644,13 +809,13 @@ export default function Auction() {
                     <div className="mb-2">
                       <div className="flex justify-between text-[10px] mb-1">
                         <span className="text-slate-400 font-raj">Budget left</span>
-                        <span className="font-orbitron font-bold" style={{color: t.budgetLeft < 100 ? '#dc2626' : t.color}}>
+                        <span className="font-orbitron font-bold" style={{color: t.budgetLeft < 100 ? '#F59E0B' : t.color}}>
                           {Math.round(t.budgetLeft)} <span className="font-normal text-slate-400">pts</span>
                         </span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-500"
-                          style={{width:`${budgetPct}%`, background:`linear-gradient(90deg,${t.color},#dc2626)`}}/>
+                          style={{width:`${budgetPct}%`, background:`linear-gradient(90deg,${t.color},#F59E0B)`}}/>
                       </div>
                     </div>
 
@@ -682,18 +847,19 @@ export default function Auction() {
                     <button onClick={() => handleBid(t._id)}
                       disabled={!currentPlayer || isPaused || slotsLeft === 0}
                       title={slotsLeft === 0 ? 'Squad full' : wouldExceed ? `Next bid (${nextBidAmt}) exceeds max allowed (${maxBid})` : `Bid ${nextBidAmt} pts`}
-                      className={`w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold font-raj tracking-widest transition-all uppercase
-                        text-white disabled:opacity-30 disabled:cursor-not-allowed
+                      className={`bid-btn w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold font-raj tracking-widest transition-all uppercase
+                        text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-95
                         ${!(slotsLeft === 0 || wouldExceed) ? 'hover:-translate-y-0.5 hover:shadow-md' : ''}`}
                       style={{
                         background: slotsLeft === 0
-                          ? '#94a3b8'
+                          ? '#2E3A5C'
                           : wouldExceed
                             ? 'linear-gradient(135deg,#f97316,#ea580c)'
                             : isWin
-                              ? 'linear-gradient(135deg,#dc2626,#b91c1c)'
-                              : `linear-gradient(135deg,${t.color},#1d4ed8)`,
-                        boxShadow: isWin && slotsLeft > 0 ? '0 4px 12px rgba(220,38,38,0.35)' : 'none',
+                              ? 'linear-gradient(135deg,#F59E0B,#D97706)'
+                              : `linear-gradient(135deg,${t.color},#6366F1)`,
+                        color: isWin && slotsLeft > 0 && !wouldExceed ? '#0A0F1D' : '#fff',
+                        boxShadow: isWin && slotsLeft > 0 ? '0 4px 12px rgba(245,158,11,0.35)' : 'none',
                       }}>
                       {slotsLeft === 0
                         ? <>🔒 Squad Full</>
@@ -710,13 +876,13 @@ export default function Auction() {
       </div>
 
       {/* ══ RIGHT PANEL ══ */}
-      <div className="w-80 border-l border-white/60 flex flex-col overflow-hidden flex-shrink-0" style={{background:"rgba(255,255,255,0.82)", backdropFilter:"blur(12px)"}}>
+      <div className="w-80 border-l border-white/60 flex flex-col overflow-hidden flex-shrink-0" style={{background:"rgba(18,24,41,0.82)", backdropFilter:"blur(12px)"}}>
         <div className="section-title">🎯 Bid Rules</div>
         <div className="flex-shrink-0 p-3 space-y-3">
           {/* Active bonus */}
           {activeBonusRule && (
             <div className="rounded-xl px-3 py-2.5 text-xs flex items-center gap-2 border"
-              style={{background:'rgba(29,78,216,0.06)', borderColor:'rgba(29,78,216,0.25)', color:'#1d4ed8'}}>
+              style={{background:'rgba(99,102,241,0.06)', borderColor:'rgba(99,102,241,0.25)', color:'#818CF8'}}>
               <span className="text-lg">🎯</span>
               <span><strong>{activeBonusRule.label}</strong> — selling here awards <strong>+{activeBonusRule.bonusPoints} pts!</strong></span>
             </div>
@@ -731,14 +897,14 @@ export default function Auction() {
                   <div key={i} className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all
                     ${isActive ? 'font-bold shadow-sm' : ''}`}
                     style={isActive
-                      ? {background:'rgba(29,78,216,0.08)', borderColor:'rgba(29,78,216,0.4)', color:'#1d4ed8'}
-                      : {background:'#f8fafc', borderColor:'#e2e8f0', color:'#94a3b8'}}>
+                      ? {background:'rgba(99,102,241,0.08)', borderColor:'rgba(99,102,241,0.4)', color:'#818CF8'}
+                      : {background:'#0F1629', borderColor:'#222B45', color:'#94a3b8'}}>
                     <span className="flex items-center gap-1.5">
-                      {isActive && <span className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0" style={{background:'#1d4ed8'}}/>}
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0" style={{background:'#6366F1'}}/>}
                       {r.label}
                     </span>
                     <span className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className="font-orbitron" style={isActive?{color:'#1d4ed8'}:{color:'#94a3b8'}}>+{r.bonusPoints}pts</span>
+                      <span className="font-orbitron" style={isActive?{color:'#818CF8'}:{color:'#94a3b8'}}>+{r.bonusPoints}pts</span>
                       <span className="opacity-50">{r.minBid}–{r.maxBid===9999?'∞':r.maxBid}</span>
                     </span>
                   </div>
@@ -753,8 +919,8 @@ export default function Auction() {
           {[10, 25, 50, 100, 200].map(inc => (
             <button key={inc} onClick={() => manualInc(inc)}
               disabled={!currentPlayer || isPaused}
-              className="flex-1 min-w-[70px] px-3 py-2.5 rounded-xl text-sm font-raj font-bold border border-slate-300 bg-white
-                hover:border-blue-500 hover:text-blue-600 transition-all disabled:opacity-30">
+              className="flex-1 min-w-[70px] px-3 py-2.5 rounded-xl text-sm font-raj font-bold border border-white/10 bg-white/5
+                hover:border-amber-500 hover:text-amber-400 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-30">
               +{inc} pts
             </button>
           ))}
@@ -764,7 +930,7 @@ export default function Auction() {
         <div className="flex-shrink-0 p-3 space-y-2.5">
           <button
             className="w-full px-6 py-3.5 text-base font-display tracking-widest rounded-xl text-white font-bold transition-all hover:-translate-y-0.5 disabled:opacity-40"
-            style={{background:'linear-gradient(135deg,#059669,#0d9488)'}}
+            style={{background:'linear-gradient(135deg,#059669,#38BDF8)'}}
             onClick={() => { stopLocalTimer(); setSelectedTeam(winningTeam?._id||null); setPickModal(true); }}
             disabled={!currentPlayer || loading || isPaused}>
             🏏 PICK PLAYER
@@ -779,8 +945,8 @@ export default function Auction() {
             <button onClick={handlePauseResume}
               className="px-3 py-3 font-display tracking-widest text-sm rounded-xl border transition-all"
               style={isPaused
-                ? {background:'#eab308', color:'white', borderColor:'#eab308'}
-                : {background:'rgba(234,179,8,0.08)', borderColor:'rgba(234,179,8,0.4)', color:'#854d0e'}}>
+                ? {background:'#FBBF24', color:'#0A0F1D', borderColor:'#FBBF24'}
+                : {background:'rgba(234,179,8,0.08)', borderColor:'rgba(234,179,8,0.4)', color:'#FBBF24'}}>
               {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
             </button>
             <button className="btn-blue px-3 py-3 text-sm font-display tracking-widest rounded-xl"
@@ -791,7 +957,7 @@ export default function Auction() {
 
           <button
             className="w-full px-5 py-3 text-sm font-display tracking-widest rounded-xl text-white font-bold border-0 transition-all hover:-translate-y-0.5 disabled:opacity-40"
-            style={{background:'linear-gradient(135deg,#7c3aed,#dc2626)'}}
+            style={{background:'linear-gradient(135deg,#6366F1,#F59E0B)'}}
             onClick={handleCompleteAuction} disabled={loading}
             title="Mark auction as complete (unsold players will remain unsold)">
             🏆 FINISH AUCTION
@@ -801,7 +967,7 @@ export default function Auction() {
         <div className="section-title">📋 Bid Log</div>
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {(room.auctionLog||[]).slice().reverse().slice(0,25).map((e,i) => (
-            <div key={i} className={`text-xs px-2.5 py-1.5 rounded-lg font-raj
+            <div key={`${e.timestamp}-${e.message}`} style={{animation:'navIn .45s cubic-bezier(.22,1,.36,1) backwards'}} className={`text-xs px-2.5 py-1.5 rounded-lg font-raj
               ${e.type==='sold'    ? 'text-emerald-700 bg-emerald-50'
                 : e.type==='unsold' ? 'text-red-600 bg-red-50'
                 : e.type==='retain' ? 'text-blue-600 bg-blue-50'
@@ -849,7 +1015,7 @@ export default function Auction() {
                       className={`flex items-center gap-2.5 p-2.5 rounded-xl border-2 cursor-pointer transition-all`}
                       style={pickUnsoldPlayer_?._id === p._id
                         ? {borderColor:'#d97706', background:'rgba(217,119,6,0.06)'}
-                        : {borderColor:'#e2e8f0', background:'#f8fafc'}}>
+                        : {borderColor:'#222B45', background:'#0F1629'}}>
                       <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-500 border border-slate-300">
                         {p.photo ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover"/> : p.name[0]}
                       </div>
@@ -903,13 +1069,13 @@ export default function Auction() {
                                 className={`flex items-center gap-2 p-2.5 rounded-xl border-2 transition-all ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:shadow-sm'}`}
                                 style={pickUnsoldTeam === t._id
                                   ? {borderColor: t.color, background:`${t.color}10`}
-                                  : {borderColor:'#e2e8f0', background:'#f8fafc'}}>
+                                  : {borderColor:'#222B45', background:'#0F1629'}}>
                                 <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center font-bold text-white text-sm" style={{background: t.color}}>
                                   {t.logo ? <img src={t.logo} alt="" className="w-full h-full object-cover"/> : t.name[0]}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <div className="text-xs font-bold text-slate-800 truncate">{t.name}</div>
-                                  <div className="text-[10px]" style={{color: canAfford ? '#059669' : '#dc2626'}}>
+                                  <div className="text-[10px]" style={{color: canAfford ? '#059669' : '#F59E0B'}}>
                                     {Math.round(t.budgetLeft)} pts left
                                   </div>
                                   <div className="text-[10px] text-slate-400">{slotsLeft} slot{slotsLeft!==1?'s':''} left</div>
@@ -938,21 +1104,16 @@ export default function Auction() {
         );
       })()}
 
-      {/* Swing overlay */}
-      {showSwing && (
-        <div className="fixed inset-0 bg-white/85 backdrop-blur-sm z-[200] flex flex-col items-center justify-center gap-6">
-          <div className="text-8xl animate-swing inline-block" style={{transformOrigin:'bottom center'}}>🏏</div>
-          <div className="font-display text-5xl tracking-widest animate-fade-in" style={{color:'#dc2626'}}>NEXT UP...</div>
-        </div>
-      )}
+      {/* NEXT UP reveal */}
+      {showSwing && <NextUpOverlay player={nextUp}/>}
 
       {/* Bonus popup */}
       {bonusPopup && (
         <div className="fixed top-20 right-6 z-[350] animate-slide-right">
           <div className="bg-white border-2 rounded-2xl p-5 text-center min-w-[190px] shadow-xl"
-            style={{borderColor:'#1d4ed8'}}>
+            style={{borderColor:'#6366F1'}}>
             <div className="text-3xl mb-2">🎯</div>
-            <div className="font-display text-xl tracking-wide" style={{color:'#1d4ed8'}}>{bonusPopup.rule.label}!</div>
+            <div className="font-display text-xl tracking-wide" style={{color:'#818CF8'}}>{bonusPopup.rule.label}!</div>
             <div className="text-xs text-slate-400 my-1 font-raj">{bonusPopup.team}</div>
             <div className="font-orbitron text-emerald-600 font-bold text-sm">+{bonusPopup.rule.bonusPoints} POINTS</div>
           </div>
@@ -967,9 +1128,9 @@ export default function Auction() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] flex items-center justify-center p-4"
           onClick={() => { setPickModal(false); startLocalTimer(); }}>
           <div className="bg-white rounded-3xl p-7 w-full max-w-lg animate-pop shadow-2xl border-2"
-            style={{borderColor:'rgba(220,38,38,0.4)'}}
+            style={{borderColor:'rgba(245,158,11,0.4)'}}
             onClick={e => e.stopPropagation()}>
-            <h2 className="font-display text-2xl tracking-widest mb-4" style={{color:'#dc2626'}}>🏏 PICK PLAYER</h2>
+            <h2 className="font-display text-2xl tracking-widest mb-4" style={{color:'#F59E0B'}}>🏏 PICK PLAYER</h2>
 
             {currentPlayer && (
               <div className="mb-5 rounded-2xl overflow-hidden" style={{height:180}}>
@@ -979,7 +1140,7 @@ export default function Auction() {
 
             <div className="flex items-center justify-between mb-3">
               <span className="font-orbitron text-xs text-slate-400 uppercase tracking-widest">Assign to team</span>
-              <span className="font-orbitron text-xl font-bold" style={{color:'#dc2626'}}>{Math.round(currentBid)} pts</span>
+              <span className="font-orbitron text-xl font-bold" style={{color:'#F59E0B'}}>{Math.round(currentBid)} pts</span>
             </div>
 
             {activeBonusRule && (
@@ -998,8 +1159,8 @@ export default function Auction() {
                 <div key={t._id} onClick={() => slotsLeft > 0 ? setSelectedTeam(t._id) : null}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${slotsLeft === 0 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
                   style={selectedTeam===t._id
-                    ? {borderColor:'#dc2626', background:'rgba(220,38,38,0.05)'}
-                    : {borderColor:'#e2e8f0', background:'#f8fafc'}}>
+                    ? {borderColor:'#F59E0B', background:'rgba(245,158,11,0.05)'}
+                    : {borderColor:'#222B45', background:'#0F1629'}}>
                   <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
                     {t.logo
                       ? <img src={t.logo} alt={t.name} className="w-full h-full object-cover"/>
@@ -1007,13 +1168,13 @@ export default function Auction() {
                           style={{background:t.color}}>{t.name[0]}</div>}
                   </div>
                   <div className="text-xs font-bold text-center leading-tight text-slate-800">{t.name}</div>
-                  <div className="font-orbitron text-[10px]" style={{color: canAfford ? t.color : '#dc2626'}}>
+                  <div className="font-orbitron text-[10px]" style={{color: canAfford ? t.color : '#F59E0B'}}>
                     {Math.round(t.budgetLeft || 0)} pts left
                   </div>
                   <div className="text-[9px] text-slate-400">max/player: <span className="font-bold text-blue-600">{slotsLeft > 0 ? maxBid : '—'} pts</span></div>
                   <div className="text-[10px] text-slate-400">{slotsLeft} slots left</div>
                   {!canAfford && slotsLeft > 0 && (
-                    <div className="text-[9px] text-red-500 font-bold">⚠ Over max</div>
+                    <div className="text-[9px] text-amber-500 font-bold">⚠ Over max</div>
                   )}
                 </div>
                 );
@@ -1024,7 +1185,7 @@ export default function Auction() {
               <button className="btn-ghost flex-1 py-3"
                 onClick={() => { setPickModal(false); startLocalTimer(); }}>Cancel</button>
               <button className="flex-1 py-3 text-sm font-display tracking-widest rounded-lg text-white font-bold transition-all hover:-translate-y-0.5 disabled:opacity-40"
-                style={{background:'linear-gradient(135deg,#059669,#0d9488)'}}
+                style={{background:'linear-gradient(135deg,#059669,#38BDF8)'}}
                 onClick={confirmSell} disabled={loading || !selectedTeam}>
                 {loading ? '⏳ Saving...' : '✅ CONFIRM SOLD'}
               </button>

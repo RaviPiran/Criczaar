@@ -78,7 +78,7 @@ export default function Results() {
             ['Total Sold',  sold.length,                                      'text-emerald-700', 'glass-card'],
             ['Unsold',      unsold.length,                                    'text-red-600',     'glass-card-red'],
             ['Total Spent', `${Math.round(totalSpent)} pts`,                  'text-blue-700',    'glass-card'],
-            ['Top Sale',    topSale ? `${Math.round(topSale.soldPrice || 0)} pts` : '—', 'text-red-700', 'glass-card-red'],
+            ['Top Sale',    topSale ? `${Math.round(topSale.soldPrice || 0)} pts` : '—', 'text-amber-700', 'glass-card-red'],
           ].map(([l, v, c, cls]) => (
             <div key={l} className={`${cls} rounded-2xl p-5 text-center`}>
               <div className={`font-orbitron text-2xl font-bold ${c}`}>{v}</div>
@@ -108,7 +108,7 @@ export default function Results() {
                       <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
                         {p.team && (
                           <span className="inline-flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full" style={{ background: p.team.color || '#dc2626' }}/>
+                            <span className="w-2 h-2 rounded-full" style={{ background: p.team.color || '#F59E0B' }}/>
                             {p.team.name}
                           </span>
                         )}
@@ -116,7 +116,7 @@ export default function Results() {
                         {p.isRetained && <span className="text-blue-500">🔒 Retained</span>}
                       </div>
                     </div>
-                    <div className="font-orbitron text-sm font-bold text-red-600 flex-shrink-0">
+                    <div className="font-orbitron text-sm font-bold text-amber-600 flex-shrink-0">
                       {Math.round(p.soldPrice || 0)} pts
                     </div>
                   </div>
@@ -135,7 +135,7 @@ export default function Results() {
               const spent = (team.budget || 0) - (team.budgetLeft ?? team.budget ?? 0);
               return (
                 <div key={team._id} className="glass-card rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-1.5" style={{ background: `linear-gradient(90deg,${team.color},rgba(29,78,216,0.6))` }}/>
+                  <div className="h-1.5" style={{ background: `linear-gradient(90deg,${team.color},rgba(99,102,241,0.6))` }}/>
                   <div className="p-5">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-11 h-11 rounded-full overflow-hidden border-2 flex-shrink-0" style={{ borderColor: team.color }}>
@@ -154,7 +154,7 @@ export default function Results() {
                     {/* Budget bar */}
                     <div className="w-full bg-slate-200/60 rounded-full h-1.5 mb-4 overflow-hidden">
                       <div className="h-full rounded-full transition-all"
-                        style={{ width: `${Math.min(Math.round((spent / (team.budget || 1)) * 100), 100)}%`, background: 'linear-gradient(90deg,#dc2626,#1d4ed8)' }}/>
+                        style={{ width: `${Math.min(Math.round((spent / (team.budget || 1)) * 100), 100)}%`, background: 'linear-gradient(90deg,#F59E0B,#6366F1)' }}/>
                     </div>
 
                     {/* Player list */}
@@ -171,7 +171,7 @@ export default function Results() {
                             <span className="flex-1 text-slate-700 font-semibold truncate">{p.name || 'Unknown'}</span>
                             {p.role && <span className="text-[10px] text-slate-400 hidden sm:inline">{p.role}</span>}
                             {p.isRetained && <span className="text-xs text-blue-500 flex-shrink-0">🔒</span>}
-                            <span className="font-orbitron text-xs flex-shrink-0" style={{ color: '#dc2626' }}>
+                            <span className="font-orbitron text-xs flex-shrink-0" style={{ color: '#F59E0B' }}>
                               {Math.round(p.soldPrice || p.retainPrice || 0)} pts
                             </span>
                           </div>
@@ -183,7 +183,7 @@ export default function Results() {
                     <div className="mt-3 flex gap-0.5">
                       {Array.from({ length: team.slots }).map((_, i) => (
                         <div key={i} className="flex-1 h-1 rounded-sm"
-                          style={{ background: i < teamPlayers.length ? team.color : '#e2e8f0' }}/>
+                          style={{ background: i < teamPlayers.length ? team.color : '#222B45' }}/>
                       ))}
                     </div>
                     <div className="text-[10px] text-slate-400 mt-1">{teamPlayers.length}/{team.slots} slots filled</div>
@@ -200,11 +200,11 @@ export default function Results() {
             <h3 className="font-orbitron text-xs text-red-500 uppercase tracking-widest">Unsold Players ({unsold.length})</h3>
             <div className="flex flex-wrap gap-2">
               {unsold.map(p => (
-                <div key={p._id} className="flex items-center gap-2 bg-red-50/80 border border-red-200 rounded-lg px-3 py-1.5">
+                <div key={p._id} className="flex items-center gap-2 bg-amber-50/80 border border-amber-200 rounded-lg px-3 py-1.5">
                   <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
                     {p.photo
                       ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover"/>
-                      : <div className="w-full h-full bg-red-100 flex items-center justify-center text-xs text-red-500">{p.name[0]}</div>}
+                      : <div className="w-full h-full bg-amber-100 flex items-center justify-center text-xs text-amber-500">{p.name[0]}</div>}
                   </div>
                   <span className="text-sm text-slate-600 font-semibold">{p.name}</span>
                   <span className="text-xs text-slate-400">{p.basePrice} pts</span>
