@@ -8,6 +8,7 @@ import { getFullRoom, nextPlayer, placeBidAPI, sellPlayer, markUnsoldAPI, update
 import TimerRing from '../components/TimerRing';
 import SoldBurst from '../components/SoldBurst';
 import PlayerProfileCard from '../components/PlayerProfileCard';
+import FullscreenButton from '../components/FullscreenButton';
 
 function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPickUnsold, onCompleteAuction, loading }) {
   const remaining = players.filter(p => p.status === 'remaining');
@@ -702,9 +703,12 @@ export default function Auction() {
                   <span className={`w-1.5 h-1.5 rounded-full bg-amber-400 ${isPaused ? '' : 'live-dot'}`}/>
                   {isPaused ? 'Paused' : 'Live Bidding'}
                 </span>
-                <span className="font-mono text-[10px] tracking-widest uppercase text-white/40 px-2.5 py-1 rounded-md border border-white/10">
-                  Lot #{sold + unsold + 1}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] tracking-widest uppercase text-white/40 px-2.5 py-1 rounded-md border border-white/10">
+                    Lot #{sold + unsold + 1}
+                  </span>
+                  <FullscreenButton size="sm" />
+                </div>
               </div>
 
               <div className="relative">

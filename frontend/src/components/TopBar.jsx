@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuction } from '../context/AuctionContext';
+import FullscreenButton from './FullscreenButton';
 
 const PAGE_TITLES = {
   '/dashboard':  { title:'Dashboard',    icon:'🏠', sub:'Overview of your auction' },
@@ -36,7 +37,7 @@ export default function TopBar({ onMenuClick }) {
         </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2.5 sm:gap-3">
         {room && room.status !== 'setup' && (
           <div className="hidden sm:flex items-center gap-3 bg-ink-50 border border-ink-200 rounded-xl px-4 py-2 text-xs font-mono">
             <span className="text-slate-500">Sold <strong className="text-emerald-500 font-mono">{sold}</strong></span>
@@ -59,6 +60,9 @@ export default function TopBar({ onMenuClick }) {
             <span className="font-mono text-amber-500 text-sm font-bold">{room.code}</span>
           </div>
         )}
+
+        {/* Native Fullscreen Button (Hides Google tabs & address bar like YouTube) */}
+        <FullscreenButton showLabel={false} />
       </div>
     </header>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import FullscreenButton from '../components/FullscreenButton';
 
 /* ── page-local styles & keyframes (prefixed ls-) ───────────────────── */
 const LS_CSS = `
@@ -357,6 +358,7 @@ export default function LiveSpectator() {
               style={{ borderColor:'rgba(255,255,255,0.12)', color: copied ? '#34D399' : 'rgba(255,255,255,0.6)', background:'rgba(255,255,255,0.04)' }}>
               {copied ? '✓ Copied' : '🔗 Share'}
             </button>
+            <FullscreenButton size="sm" />
           </div>
         </div>
 
