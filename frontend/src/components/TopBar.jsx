@@ -61,6 +61,18 @@ export default function TopBar({ onMenuClick }) {
           </div>
         )}
 
+        {room && (
+          <a
+            href={`/projector/${room.code}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Projector / Big Screen Stage Display"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/40 transition-all shadow-sm">
+            <span>📽️</span>
+            <span>Projector View</span>
+          </a>
+        )}
+
         {/* Native Fullscreen Button (Hides Google tabs & address bar like YouTube) */}
         <FullscreenButton showLabel={false} />
       </div>

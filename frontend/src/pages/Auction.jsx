@@ -9,8 +9,9 @@ import TimerRing from '../components/TimerRing';
 import SoldBurst from '../components/SoldBurst';
 import PlayerProfileCard from '../components/PlayerProfileCard';
 import FullscreenButton from '../components/FullscreenButton';
+import ShareLiveLink from '../components/ShareLiveLink';
 
-function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPickUnsold, onCompleteAuction, loading }) {
+function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPickUnsold, onCompleteAuction, loading, roomId }) {
   const remaining = players.filter(p => p.status === 'remaining');
   const segments  = remaining.length > 0 ? remaining : [];
   const count     = segments.length || 6; // fallback for display
@@ -38,13 +39,6 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
     const pickedPlayer = segments[pickedIdx];
 
     // 2. Pointer is at the TOP (0° / 12 o'clock).
-    //    polarToCartesian uses (angle - 90), so angle=0 → top of SVG.
-    //    Segment i draws from angle (i*slice) to ((i+1)*slice), starting at top going clockwise.
-    //    Segment i's visual centre angle = i*slice + slice/2  (from top, clockwise).
-    //    After rotating the wheel by R degrees clockwise, the segment centre sits at:
-    //      (segCentre + R) % 360
-    //    We want that to equal 0 (top pointer):
-    //      R_needed = ((-segCentre) % 360 + 360) % 360
     const segCentre  = pickedIdx * slice + slice / 2;
     const neededAngle = ((-segCentre) % 360 + 360) % 360;
 
@@ -58,6 +52,14 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
     setSpinning(true);
     setRotation(target);
     finalRotationRef.current = target;
+
+    // Broadcast wheel spin to Projector Screen in real time
+    if (roomId) {
+      try {
+        getSocket().emit('wheel-spin', { roomId, rotation: target, pickedPlayer });
+      } catch (err) {}
+    }
+
     clearTimeout(spinRef.current);
     spinRef.current = setTimeout(() => {
       setSpinning(false);
@@ -193,7 +195,7 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
       </div>
 
       {/* Buttons */}
-      <div className="flex gap-3 mt-1">
+      <div className="flex gap-3 mt-1 items-center flex-wrap justify-center">
         <button
           onClick={handleSpin}
           disabled={spinning || landed}
@@ -207,6 +209,14 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
             className="px-8 py-3 rounded-xl font-display tracking-widest text-white font-bold text-base transition-all hover:-translate-y-0.5"
             style={{background:'linear-gradient(135deg,#059669,#38BDF8)'}}>
             🏏 Load {landedPlayer ? landedPlayer.name : 'Player'}
+          </button>
+        )}
+        {landed && !spinning && (
+          <button
+            onClick={() => { setLanded(false); setLandedPlayer(null); }}
+            className="px-5 py-3 rounded-xl font-mono text-xs font-bold text-amber-300 hover:text-white bg-white/10 hover:bg-white/15 border border-amber-400/40 transition-all flex items-center gap-1.5"
+            title="Spin again to draw a different player">
+            🔄 Re-Spin
           </button>
         )}
       </div>
@@ -452,6 +462,16 @@ export default function Auction() {
     }, 1900);
   };
 
+  const handleBackToWheel = () => {
+    stopLocalTimer();
+    dispatch({ type: 'SET_CURRENT_PLAYER', payload: null });
+    setShowWheel(true);
+    const s = getSocket();
+    s.emit('next-player', { roomId: room._id, player: null });
+    s.emit('timer-stopped', { roomId: room._id });
+    toast('🎡 Returned to Spin Wheel', { icon: '🎡' });
+  };
+
   const handleStartRound2 = async () => {
     setLoading(true);
     try {
@@ -683,6 +703,7 @@ export default function Auction() {
             onPickUnsold={() => setUnsoldPickModal(true)}
             onCompleteAuction={handleCompleteAuction}
             loading={loading}
+            roomId={room._id}
           />
         ) : currentPlayer ? (
           <div className={`flex-shrink-0 flex gap-3 items-stretch transition-opacity duration-300 ${isPaused ? 'opacity-60' : ''}`}>
@@ -960,6 +981,19 @@ export default function Auction() {
           </div>
 
           <button
+            onClick={handleBackToWheel}
+            disabled={loading || isPaused}
+            className="w-full px-4 py-3 text-xs font-display tracking-widest rounded-xl border transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 shadow-md active:scale-95 font-bold"
+            style={{
+              background: 'linear-gradient(135deg, rgba(245,158,11,0.18), rgba(99,102,241,0.22))',
+              borderColor: 'rgba(245,158,11,0.45)',
+              color: '#FBBF24',
+            }}
+            title="Return to Spin Wheel to draw or change player">
+            🎡 {currentPlayer ? 'CHANGE PLAYER / BACK TO WHEEL' : 'OPEN SPIN WHEEL'}
+          </button>
+
+          <button
             className="w-full px-5 py-3 text-sm font-display tracking-widest rounded-xl text-white font-bold border-0 transition-all hover:-translate-y-0.5 disabled:opacity-40"
             style={{background:'linear-gradient(135deg,#6366F1,#F59E0B)'}}
             onClick={handleCompleteAuction} disabled={loading}
@@ -1125,7 +1159,18 @@ export default function Auction() {
       )}
 
       {/* Sold burst */}
-      {soldResult && <SoldBurst result={soldResult} onClose={() => { setSoldResult(null); if (!round2ReadyRef.current) setShowWheel(true); }}/>}
+      {soldResult && (
+        <SoldBurst
+          result={soldResult}
+          onClose={() => {
+            setSoldResult(null);
+            if (!round2ReadyRef.current) {
+              setShowWheel(true);
+              getSocket().emit('next-player', { roomId: room._id, player: null });
+            }
+          }}
+        />
+      )}
 
       {/* Pick modal */}
       {pickModal && (

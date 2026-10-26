@@ -31,6 +31,8 @@ const CSS = `
   -webkit-mask-composite:xor; mask-composite:exclude;
   animation:ppcSpin 7s linear infinite;
 }
+.ppc-wrap { width: 100% !important; max-width: 100% !important; display: block !important; }
+.ppc-card { width: 100% !important; }
 @media (prefers-reduced-motion: reduce){
   .ppc-card *, .ppc-card::before, .ppc-wrap { animation-duration:.01ms !important; animation-iteration-count:1 !important; }
 }
@@ -85,7 +87,7 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
   return (
     // key → whole card re-plays its entrance every time a new player is loaded
     <div key={player._id || player.id || player.name} className="ppc-wrap"
-      style={{ perspective: 1200, animation: 'ppcIn .7s cubic-bezier(.22,1,.36,1) backwards' }}>
+      style={{ perspective: 1200, animation: 'ppcIn .7s cubic-bezier(.22,1,.36,1) backwards', width: '100%' }}>
       <style>{CSS}</style>
 
       <div ref={cardRef} className="ppc-card" onMouseMove={onMove} onMouseLeave={onLeave}
@@ -168,7 +170,7 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
             animation:'ppcPhoto .9s .15s cubic-bezier(.22,1,.36,1) backwards' }}>
             <img src={player.photo} alt={player.name}
               style={{
-                width:'100%', height:'100%', objectFit:'cover', display:'block',
+                width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', display:'block',
                 animation:'ppcFloat 6s 1s ease-in-out infinite',
                 WebkitMaskImage:'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.65) 28%, #000 58%), linear-gradient(to top, transparent 0%, #000 22%)',
                 WebkitMaskComposite:'source-in',
@@ -184,7 +186,14 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
             <img src={`${process.env.PUBLIC_URL || ''}/non-profile.png`} alt={player.name}
               draggable={false}
               style={{
-                width:'112%', maxWidth:'none', height:'auto', display:'block', marginBottom: lg ? -8 : -4,
+                width:'auto',
+                height:'92%',
+                maxWidth:'92%',
+                maxHeight:'92%',
+                objectFit:'contain',
+                objectPosition:'bottom center',
+                display:'block',
+                marginBottom: lg ? -4 : -2,
                 animation:'ppcFloat 6s 1s ease-in-out infinite',
                 filter:`drop-shadow(0 0 24px rgba(${c.glow},0.55))`,
               }}/>
