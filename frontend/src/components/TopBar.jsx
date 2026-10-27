@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuction } from '../context/AuctionContext';
 import FullscreenButton from './FullscreenButton';
+import criczaarLogo from '../logo.png';
 
 const PAGE_TITLES = {
   '/dashboard':  { title:'Dashboard',    icon:'🏠', sub:'Overview of your auction' },
@@ -27,9 +28,9 @@ export default function TopBar({ onMenuClick }) {
       <button onClick={onMenuClick} className="lg:hidden text-slate-500 hover:text-amber-500 text-xl p-1 transition-colors">☰</button>
 
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg"
-          style={{background:'linear-gradient(135deg,#FBBF24,#F59E0B)'}}>
-          <span className="text-white text-sm">{meta.icon}</span>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center p-1 border border-white/10 shadow-sm flex-shrink-0"
+          style={{background:'linear-gradient(135deg,rgba(245,158,11,0.2),rgba(15,22,41,0.8))'}}>
+          <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
         </div>
         <div>
           <h1 className="font-display text-lg leading-none tracking-wide text-ink-900">{meta.title}</h1>

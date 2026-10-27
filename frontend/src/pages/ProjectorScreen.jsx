@@ -4,6 +4,8 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import FullscreenButton from '../components/FullscreenButton';
 import PlayerProfileCard from '../components/PlayerProfileCard';
+import LuxurySpinWheel from '../components/LuxurySpinWheel';
+import criczaarLogo from '../logo.png';
 import {
   playBidChime,
   playCountdownTick,
@@ -79,9 +81,9 @@ export default function ProjectorScreen() {
   });
 
   // Spin Wheel State on Projector
-  const [wheelRotation,      setWheelRotation]      = useState(0);
   const [wheelSpinning,      setWheelSpinning]      = useState(false);
   const [wheelLandedPlayer,  setWheelLandedPlayer]  = useState(null);
+  const [externalSpinData,   setExternalSpinData]   = useState(null);
 
   const socketRef          = useRef(null);
   const timerMaxRef        = useRef(30);
@@ -188,29 +190,23 @@ export default function ProjectorScreen() {
     });
 
     // Spin wheel broadcast event from host
-    s.on('wheel-spin', ({ rotation, pickedPlayer }) => {
+    s.on('wheel-spin', (data) => {
       setWheelSpinning(true);
-      setWheelRotation(rotation);
       setWheelLandedPlayer(null);
+      const targetAngle = data.targetAngle ?? data.rotation;
+      const winnerPlayer = data.winnerPlayer ?? data.pickedPlayer;
+      const activeSegments = data.activeSegments ?? data.displaySegments;
+      const duration = data.duration || 4800;
 
-      // Play ticking clicks during spin
-      clearInterval(clickTickerRef.current);
-      if (soundEnabled) {
-        let count = 0;
-        clickTickerRef.current = setInterval(() => {
-          playWheelClick();
-          count++;
-          if (count > 28) clearInterval(clickTickerRef.current);
-        }, 130);
-      }
-
-      // Finish spin after 4.2s
-      setTimeout(() => {
-        clearInterval(clickTickerRef.current);
-        setWheelSpinning(false);
-        setWheelLandedPlayer(pickedPlayer);
-        if (soundEnabled) playBidChime();
-      }, 4200);
+      setExternalSpinData({
+        targetAngle,
+        winnerPlayer,
+        winnerLotNumber: data.winnerLotNumber,
+        activeSegments,
+        sliceDisplayMode: data.sliceDisplayMode || 'mystery',
+        duration,
+        timestamp: Date.now(),
+      });
     });
 
     // Timer ticks
@@ -347,28 +343,6 @@ export default function ProjectorScreen() {
 
   const nextMinBid = currentBid > 0 ? currentBid + getNextIncrement(currentBid) : (currentPlayer?.basePrice || 0);
 
-  // ── Spin Wheel geometry ───────────────────────────────────────────────────
-  const wheelSegments = remainPlayers.length > 0 ? remainPlayers : [];
-  const wheelCount = wheelSegments.length || 8;
-  const wheelSliceAngle = 360 / wheelCount;
-  const wheelSize = 430;
-  const wheelRadius = wheelSize / 2 - 12;
-  const wheelCenter = wheelSize / 2;
-
-  const polarToCartesian = (angle, radius) => {
-    const rad = (angle - 90) * (Math.PI / 180);
-    return { x: wheelCenter + radius * Math.cos(rad), y: wheelCenter + radius * Math.sin(rad) };
-  };
-
-  const makeSlicePath = (i) => {
-    const start = i * wheelSliceAngle;
-    const end   = start + wheelSliceAngle;
-    const p1    = polarToCartesian(start, wheelRadius);
-    const p2    = polarToCartesian(end, wheelRadius);
-    const large = wheelSliceAngle > 180 ? 1 : 0;
-    return `M ${wheelCenter} ${wheelCenter} L ${p1.x} ${p1.y} A ${wheelRadius} ${wheelRadius} 0 ${large} 1 ${p2.x} ${p2.y} Z`;
-  };
-
   // ── Loading screen ────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -437,12 +411,12 @@ export default function ProjectorScreen() {
         {/* Brand & Room Info */}
         <div className="flex items-center gap-4 min-w-0">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-display text-2xl font-black text-slate-950 shadow-lg transition-colors duration-500 flex-shrink-0"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center p-1.5 border border-white/20 shadow-lg transition-colors duration-500 flex-shrink-0 overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${maxBidColor}, #F59E0B)`,
+              background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(15,22,41,0.9) 100%)',
               boxShadow: `0 4px 20px ${maxBidColor}66`,
             }}>
-            C
+            <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -592,7 +566,8 @@ export default function ProjectorScreen() {
                     <span className="px-4 py-1.5 rounded-full font-mono text-xs font-black tracking-[0.25em] bg-black/70 border border-amber-400/60 text-amber-400 shadow-md">
                       LOT #{soldPlayers.length + unsoldPlayers.length + 1}
                     </span>
-                    <span className="font-mono text-xs text-slate-300 font-bold uppercase tracking-widest hidden sm:inline">
+                    <span className="font-mono text-xs text-slate-300 font-bold uppercase tracking-widest hidden sm:inline-flex items-center gap-1.5">
+                      <img src={criczaarLogo} alt="" className="w-4 h-4 object-contain" />
                       CRICZAAR STAGE LOT CARD
                     </span>
                   </div>
@@ -923,155 +898,21 @@ export default function ProjectorScreen() {
             /* ── 4. GRAND PROJECTOR SPIN WHEEL & RECORD BUYS (BETWEEN PLAYERS) ── */
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0 items-stretch">
 
-              {/* LEFT: GRAND SPIN WHEEL (7 cols) */}
-              <div className="lg:col-span-7 rounded-3xl p-5 border border-white/10 bg-gradient-to-br from-[#141C33]/95 to-[#0A0F1D]/95 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl">
+              {/* LEFT: GRAND LUXURY CANVAS SPIN WHEEL (7 cols) */}
+              <div className="lg:col-span-7 rounded-3xl p-5 border border-white/10 bg-gradient-to-br from-[#141C33]/95 to-[#0A0F1D]/95 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
                 {/* Backlight */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none opacity-25 bg-amber-400 blur-3xl"/>
 
-                {/* Header */}
-                <div className="w-full flex items-center justify-between z-10 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2.5 h-2.5 rounded-full ${wheelSpinning ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`}/>
-                    <span className="font-mono text-xs font-black tracking-[0.25em] text-amber-400 uppercase">
-                      {wheelSpinning ? 'SPINNING FOR NEXT LOT…' : (soldPlayers.length > 0 ? 'STAGE DRAW WHEEL' : 'OPENING STAGE DRAW WHEEL')}
-                    </span>
-                  </div>
-                  <span className="font-mono text-xs text-slate-400">
-                    POOL: <strong className="text-white">{wheelSegments.length} PLAYERS</strong>
-                  </span>
-                </div>
-
-                {/* Wheel + Pointer */}
-                <div className="relative flex items-center justify-center my-auto py-2 z-10">
-                  {/* Golden Top Pointer */}
-                  <div
-                    className={`absolute -top-3 left-1/2 z-20 pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] ${
-                      wheelSpinning ? 'animate-[prjPointerTick_0.15s_infinite]' : ''
-                    }`}
-                    style={{ transform: 'translateX(-50%)' }}>
-                    <svg width="34" height="42" viewBox="0 0 34 42">
-                      <polygon points="17,42 0,0 17,8 34,0" fill="#F59E0B" stroke="#0A0F1D" strokeWidth="2"/>
-                      <polygon points="17,35 6,4 17,9 28,4" fill="#FBBF24"/>
-                    </svg>
-                  </div>
-
-                  {/* SVG Wheel */}
-                  <div
-                    className={`relative rounded-full ${wheelSpinning ? 'prj-wheel-glow' : 'shadow-2xl'}`}
-                    style={{
-                      width: wheelSize,
-                      height: wheelSize,
-                      transform: `rotate(${wheelRotation}deg)`,
-                      transition: wheelSpinning ? 'transform 4.2s cubic-bezier(0.17, 0.67, 0.12, 1)' : 'none',
-                    }}>
-                    <svg width={wheelSize} height={wheelSize} viewBox={`0 0 ${wheelSize} ${wheelSize}`}>
-                      <defs>
-                        <radialGradient id="hubGrad" cx="50%" cy="50%" r="50%">
-                          <stop offset="0%" stopColor="#2E3A5C" />
-                          <stop offset="70%" stopColor="#121829" />
-                          <stop offset="100%" stopColor="#0A0F1D" />
-                        </radialGradient>
-                      </defs>
-
-                      {/* Slices */}
-                      {wheelSegments.map((seg, i) => {
-                        const midAngle = i * wheelSliceAngle + wheelSliceAngle / 2 - 90;
-                        const midRad   = midAngle * (Math.PI / 180);
-                        const textR    = wheelRadius * 0.68;
-                        const tx       = wheelCenter + textR * Math.cos(midRad);
-                        const ty       = wheelCenter + textR * Math.sin(midRad);
-                        const name     = seg.name || '???';
-                        const short    = name.length > 12 ? name.slice(0, 11) + '…' : name;
-                        const sliceColor = WHEEL_PALETTE[i % WHEEL_PALETTE.length];
-
-                        return (
-                          <g key={seg._id || i}>
-                            <path
-                              d={makeSlicePath(i)}
-                              fill={sliceColor}
-                              stroke="#0A0F1D"
-                              strokeWidth="2.5"
-                            />
-                            <text
-                              x={tx}
-                              y={ty}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
-                              fill={['#6366F1', '#818CF8', '#A78BFA', '#8B5CF6'].includes(sliceColor) ? '#FFFFFF' : '#0A0F1D'}
-                              fontSize="12"
-                              fontWeight="800"
-                              fontFamily="'Outfit', sans-serif"
-                              letterSpacing="0.04em"
-                              style={{ pointerEvents: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
-                              {short.toUpperCase()}
-                            </text>
-                          </g>
-                        );
-                      })}
-
-                      {/* Perimeter Gold Rim */}
-                      <circle
-                        cx={wheelCenter}
-                        cy={wheelCenter}
-                        r={wheelRadius}
-                        fill="none"
-                        stroke="#F59E0B"
-                        strokeWidth="5"
-                        style={{ filter: 'drop-shadow(0 0 10px rgba(245,158,11,0.6))' }}
-                      />
-                      <circle cx={wheelCenter} cy={wheelCenter} r={wheelRadius + 4} fill="none" stroke="#0A0F1D" strokeWidth="3" />
-
-                      {/* Perimeter Stadium LED Bulbs */}
-                      {Array.from({ length: 24 }).map((_, bulbIdx) => {
-                        const bulbAngle = (bulbIdx * (360 / 24)) * (Math.PI / 180);
-                        const bx = wheelCenter + (wheelRadius - 2) * Math.cos(bulbAngle);
-                        const by = wheelCenter + (wheelRadius - 2) * Math.sin(bulbAngle);
-                        return (
-                          <circle
-                            key={bulbIdx}
-                            cx={bx}
-                            cy={by}
-                            r={bulbIdx % 2 === 0 ? 3.5 : 2.5}
-                            fill={bulbIdx % 2 === 0 ? '#FDE68A' : '#F59E0B'}
-                            style={{ filter: 'drop-shadow(0 0 4px #FBBF24)' }}
-                          />
-                        );
-                      })}
-
-                      {/* Metallic Hub */}
-                      <circle cx={wheelCenter} cy={wheelCenter} r={28} fill="url(#hubGrad)" stroke="#F59E0B" strokeWidth="4" />
-                      <circle cx={wheelCenter} cy={wheelCenter} r={18} fill="#F59E0B" />
-                      <circle cx={wheelCenter} cy={wheelCenter} r={10} fill="#121829" />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Landed Player Spotlight */}
-                {wheelLandedPlayer && (
-                  <div
-                    key={wheelLandedPlayer._id || wheelLandedPlayer.name}
-                    style={{ animation: 'prjStampIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both' }}
-                    className="z-10 mt-2 p-3 rounded-2xl bg-gradient-to-r from-amber-500/20 via-black/80 to-amber-500/20 border-2 border-amber-400 flex items-center justify-between gap-4 w-full max-w-lg shadow-xl shadow-amber-500/20">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">🎯</span>
-                      <div>
-                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-amber-400 font-bold block">
-                          SELECTED ON WHEEL
-                        </span>
-                        <h3 className="font-display font-black text-xl text-white uppercase truncate">
-                          {wheelLandedPlayer.name}
-                        </h3>
-                      </div>
-                    </div>
-                    <div className="text-right font-mono">
-                      <span className="text-[9px] text-slate-400 block uppercase">Base Price</span>
-                      <span className="text-base font-bold text-amber-400">
-                        {wheelLandedPlayer.basePrice || 0} pts
-                      </span>
-                    </div>
-                  </div>
-                )}
+                <LuxurySpinWheel
+                  players={players}
+                  isHost={false}
+                  size={450}
+                  externalSpin={externalSpinData}
+                  onLanded={(winner) => {
+                    setWheelSpinning(false);
+                    setWheelLandedPlayer(winner);
+                  }}
+                />
 
                 <div className="z-10 text-center font-mono text-xs text-slate-400 mt-2">
                   {wheelSpinning ? '🌀 DRAWING LOT IN REAL-TIME…' : '🎡 WHEEL SPINS IN SYNC WITH THE AUCTIONEER DESK'}

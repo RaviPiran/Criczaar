@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import criczaarLogo from '../logo.png';
 
 /* ── role themes (palette: amber / indigo / sky on ink) ───────────── */
 const ROLE_COLORS = {
@@ -139,15 +140,14 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
         <div style={{
           position:'absolute', top: lg ? 20 : 12, left: lg ? 20 : 12, zIndex:10,
           display:'flex', alignItems:'center', gap:7,
-          background:'rgba(10,15,29,0.65)', backdropFilter:'blur(8px)',
+          background:'rgba(10,15,29,0.75)', backdropFilter:'blur(8px)',
           border:`1px solid rgba(${c.glow},0.55)`, color:c.accent,
           padding: lg ? '5px 14px' : '3px 9px', borderRadius:999,
           fontFamily:"'JetBrains Mono', monospace", fontWeight:700,
           fontSize: lg ? 10 : 7, letterSpacing: 2, textTransform:'uppercase',
           animation:'ppcChip .5s .1s cubic-bezier(.22,1,.36,1) backwards',
         }}>
-          <span style={{ width: lg ? 7 : 5, height: lg ? 7 : 5, borderRadius:'50%', background:c.accent,
-            '--ppc-glow': c.glow, animation:'ppcPulse 1.6s ease-out infinite' }}/>
+          <img src={criczaarLogo} alt="CricZaar" style={{ width: lg ? 14 : 10, height: lg ? 14 : 10, objectFit:'contain' }} />
           Player Profile
         </div>
 
@@ -206,7 +206,8 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
             background:'rgba(10,15,29,0.7)', backdropFilter:'blur(8px)',
             border:`1px solid ${c.accent}55`, color:'#fff', borderRadius:8, padding:'5px 12px',
             fontFamily:"'JetBrains Mono', monospace", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase',
-            animation:'ppcFade .6s .8s cubic-bezier(.22,1,.36,1) backwards' }}>
+            animation:'ppcFade .6s .8s cubic-bezier(.22,1,.36,1) backwards', display:'inline-flex', alignItems:'center', gap:6 }}>
+            <img src={criczaarLogo} alt="" style={{ width:12, height:12, objectFit:'contain' }} />
             {player.role || 'Player'}{player.battingStyle ? ` • ${player.battingStyle}` : ''}
           </div>
         )}

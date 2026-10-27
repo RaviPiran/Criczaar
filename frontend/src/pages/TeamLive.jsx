@@ -4,6 +4,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import FullscreenButton from '../components/FullscreenButton';
+import criczaarLogo from '../logo.png';
 
 const API_URL    = process.env.REACT_APP_API_URL    || 'http://localhost:5000/api';
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
@@ -412,8 +413,10 @@ export default function TeamLive() {
       <header className="sticky top-0 z-30 border-b backdrop-blur-xl" style={{ background:'rgba(10,15,29,0.82)', borderColor:'rgba(255,255,255,0.07)' }}>
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-display text-xl flex-shrink-0"
-              style={{ background:'linear-gradient(135deg,#FBBF24,#F59E0B)', color:'#0A0F1D', animation:'lsGlow 2.4s ease-in-out infinite' }}>C</div>
+            <div className="w-10 h-10 rounded-xl p-1 border border-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden"
+              style={{ background:'linear-gradient(135deg,rgba(245,158,11,0.25),rgba(10,15,29,0.9))', animation:'lsGlow 2.4s ease-in-out infinite' }}>
+              <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
+            </div>
             <div className="min-w-0">
               <div className="font-display text-xl leading-none">CRIC<span className="ls-gradtext">ZAAR</span></div>
               <div className="font-mono text-[9px] tracking-[0.25em] text-white/35 mt-1 truncate">TEAM BIDDING · {room?.name}</div>
@@ -872,7 +875,8 @@ export default function TeamLive() {
           </div>
         )}
 
-        <footer className="text-center py-6 font-mono text-[10px] tracking-[0.25em] uppercase text-white/25">
+        <footer className="text-center py-6 font-mono text-[10px] tracking-[0.25em] uppercase text-white/30 flex items-center justify-center gap-1.5">
+          <img src={criczaarLogo} alt="" className="w-3.5 h-3.5 object-contain inline-block opacity-60" />
           Powered by <span className="ls-gradtext font-bold">CricZaar</span> · live auction platform
         </footer>
       </main>

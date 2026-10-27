@@ -10,6 +10,7 @@ import {
 } from '../utils/api';
 import { getSocket } from '../utils/socket';
 import CricBg from '../components/CricBg';
+import criczaarLogo from '../logo.png';
 
 const statusColors = {
   active:    'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -386,11 +387,12 @@ export default function AdminDashboard() {
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-indigo-500 flex items-center justify-center animate-glow-pulse">
-              <span className="font-display text-lg" style={{color:"#0A0F1D"}}>A</span>
+            <div className="w-10 h-10 rounded-xl border border-white/20 p-1 flex items-center justify-center overflow-hidden flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg,rgba(245,158,11,0.25),rgba(10,15,29,0.9))' }}>
+              <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
             </div>
             <div>
-              <div className="font-display text-2xl text-white leading-none">ADMIN <span className="text-gradient">PANEL</span></div>
+              <div className="font-display text-2xl text-white leading-none">CRIC<span className="text-amber-500">ZAAR</span> <span className="text-gradient">ADMIN</span></div>
               <div className="text-xs text-white/40 font-raj tracking-widest">PLATFORM CONTROL</div>
             </div>
           </div>

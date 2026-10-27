@@ -10,86 +10,12 @@ import SoldBurst from '../components/SoldBurst';
 import PlayerProfileCard from '../components/PlayerProfileCard';
 import FullscreenButton from '../components/FullscreenButton';
 import ShareLiveLink from '../components/ShareLiveLink';
+import { playWheelClick, playBidChime } from '../utils/audio';
+import LuxurySpinWheel from '../components/LuxurySpinWheel';
+import criczaarLogo from '../logo.png';
 
 function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPickUnsold, onCompleteAuction, loading, roomId }) {
   const remaining = players.filter(p => p.status === 'remaining');
-  const segments  = remaining.length > 0 ? remaining : [];
-  const count     = segments.length || 6; // fallback for display
-
-  const COLORS = ['#F59E0B','#6366F1','#38BDF8','#10B981','#F87171','#A78BFA','#FB923C','#34D399','#FBBF24','#818CF8'];
-
-  const [rotation, setRotation]     = useState(0);
-  const [spinning, setSpinning]     = useState(false);
-  const [landed, setLanded]         = useState(false);
-  const [landedPlayer, setLandedPlayer] = useState(null); // the player the wheel actually landed on
-  const spinRef                     = useRef(null);
-  const finalRotationRef            = useRef(0);
-
-  const sliceAngle = 360 / count;
-
-  // Pick a random player first, then spin the wheel to land exactly on them
-  const handleSpin = () => {
-    if (spinning || landed || isCompleted || round2Ready || segments.length === 0) return;
-
-    const n = segments.length;
-    const slice = 360 / n;
-
-    // 1. Pick a random player
-    const pickedIdx    = Math.floor(Math.random() * n);
-    const pickedPlayer = segments[pickedIdx];
-
-    // 2. Pointer is at the TOP (0° / 12 o'clock).
-    const segCentre  = pickedIdx * slice + slice / 2;
-    const neededAngle = ((-segCentre) % 360 + 360) % 360;
-
-    // 3. Spin from current position: enough full turns so it looks good
-    const currentNorm = ((rotation % 360) + 360) % 360;
-    let delta = neededAngle - currentNorm;
-    if (delta < 0) delta += 360;
-    const extraTurns = (5 + Math.floor(Math.random() * 5)) * 360;
-    const target = rotation + delta + extraTurns;
-
-    setSpinning(true);
-    setRotation(target);
-    finalRotationRef.current = target;
-
-    // Broadcast wheel spin to Projector Screen in real time
-    if (roomId) {
-      try {
-        getSocket().emit('wheel-spin', { roomId, rotation: target, pickedPlayer });
-      } catch (err) {}
-    }
-
-    clearTimeout(spinRef.current);
-    spinRef.current = setTimeout(() => {
-      setSpinning(false);
-      setLanded(true);
-      setLandedPlayer(pickedPlayer);
-    }, 4200);
-  };
-
-  const size   = 300;
-  const cx     = size / 2;
-  const cy     = size / 2;
-  const r      = size / 2 - 8;
-
-  const polarToCartesian = (angle, radius) => {
-    const rad = (angle - 90) * (Math.PI / 180);
-    return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
-  };
-
-  const makeSlicePath = (i) => {
-    const start = i * sliceAngle;
-    const end   = start + sliceAngle;
-    const p1    = polarToCartesian(start, r);
-    const p2    = polarToCartesian(end, r);
-    const large = sliceAngle > 180 ? 1 : 0;
-    return `M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y} Z`;
-  };
-
-  /* ── Round 2 / Post-auction fill state ──
-     Show whenever: round2Ready flag is set OR no remaining players exist with unsold ones present
-     This handles both the normal flow AND page-reload before loadData async completes ── */
   const unsoldPlayers = players.filter(p => p.status === 'unsold');
   const shouldShowPickUnsold = round2Ready || (remaining.length === 0 && unsoldPlayers.length > 0 && !isCompleted);
 
@@ -119,7 +45,6 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
     </div>
   );
 
-  /* ── Completed state ── */
   if (isCompleted) return (
     <div className="flex-shrink-0 flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-slate-300 bg-white p-14 text-center animate-rise">
       <div className="text-5xl animate-float">🏆</div>
@@ -128,106 +53,41 @@ function SpinWheel({ players, onSpin, isCompleted, onResults, round2Ready, onPic
     </div>
   );
 
-  /* ── Normal spin wheel ── */
   return (
-    <div className="relative overflow-hidden flex-shrink-0 flex flex-col items-center justify-center gap-4 rounded-3xl border border-white/10 py-8 px-4 animate-rise"
-      style={{background:'linear-gradient(160deg,rgba(23,30,51,0.95),rgba(18,24,41,0.92))', boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}}>
+    <div className="relative overflow-hidden flex-shrink-0 flex flex-col items-center justify-center gap-2 rounded-3xl border border-white/10 py-5 px-4 animate-rise w-full max-w-xl mx-auto shadow-2xl"
+      style={{background:'linear-gradient(160deg,rgba(23,30,51,0.96),rgba(14,19,34,0.95))'}}>
       <div className="absolute -top-20 -left-16 w-72 h-72 rounded-full pointer-events-none animate-drift"
-        style={{background:'radial-gradient(circle,rgba(245,158,11,0.16),transparent 70%)'}}/>
+        style={{background:'radial-gradient(circle,rgba(245,158,11,0.18),transparent 70%)'}}/>
       <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full pointer-events-none animate-drift"
-        style={{background:'radial-gradient(circle,rgba(99,102,241,0.20),transparent 70%)', animationDelay:'-9s'}}/>
+        style={{background:'radial-gradient(circle,rgba(99,102,241,0.22),transparent 70%)', animationDelay:'-9s'}}/>
       <div className="absolute inset-0 dot-grid opacity-50 pointer-events-none"/>
-      <span className="relative inline-flex items-center gap-2 px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-[0.18em] uppercase"
-        style={{background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.35)', color:'#FBBF24'}}>
-        <span className={`w-1.5 h-1.5 rounded-full bg-amber-400 ${spinning ? 'live-dot' : ''}`}/>
-        {spinning ? 'Drawing…' : 'Player Draw'}
-      </span>
-      <p className="relative font-display text-2xl tracking-widest text-gradient">
-        Spin to pick next player
+
+      <p className="relative font-display text-2xl tracking-widest text-gradient mb-1">
+        SPIN TO PICK NEXT PLAYER
       </p>
 
-      {/* Wheel + pointer */}
-      <div className="relative flex items-center justify-center" style={{width: size}}>
-        {/* Pointer arrow — TOP centre, pointing DOWN into wheel */}
-        <div className={`absolute top-0 left-1/2 -translate-x-1/2 z-10 ${spinning ? 'pointer-tick' : ''}`} style={{filter:'drop-shadow(0 0 8px rgba(245,158,11,0.7))'}}>
-          <svg width="24" height="32" viewBox="0 0 24 32">
-            <polygon points="12,32 0,0 12,6 24,0" fill="#F59E0B"/>
-          </svg>
-        </div>
-
-        {/* SVG Wheel */}
-        <div className={spinning ? 'wheel-glow' : 'wheel-idle'} style={{
-          transform: `rotate(${rotation}deg)`,
-          transition: spinning ? 'transform 4.2s cubic-bezier(0.17,0.67,0.12,1)' : 'none',
-          borderRadius: '50%',
-        }}>
-          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-            {segments.map((seg, i) => {
-              const midAngle = i * sliceAngle + sliceAngle / 2 - 90;
-              const midRad   = midAngle * (Math.PI / 180);
-              const textR    = r * 0.65;
-              const tx       = cx + textR * Math.cos(midRad);
-              const ty       = cy + textR * Math.sin(midRad);
-              const name     = seg.name || '???';
-              const short    = name.length > 10 ? name.slice(0, 9) + '…' : name;
-              return (
-                <g key={i}>
-                  <path d={makeSlicePath(i)} fill={COLORS[i % COLORS.length]} stroke="#0A0F1D" strokeWidth="2"/>
-                  <text
-                    x={tx} y={ty}
-                    textAnchor="middle" dominantBaseline="middle"
-                    transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
-                    fill={["#6366F1","#818CF8","#A78BFA"].includes(COLORS[i % COLORS.length]) ? "#fff" : "#0A0F1D"} fontSize="11" fontWeight="bold"
-                    fontFamily="Inter, sans-serif"
-                    style={{pointerEvents:'none'}}>
-                    {short}
-                  </text>
-                </g>
-              );
-            })}
-            {/* Rim */}
-            <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(245,158,11,0.55)" strokeWidth="3"/>
-            {/* Centre hub */}
-            <circle cx={cx} cy={cy} r={18} fill="#121829" stroke="#F59E0B" strokeWidth="3"/>
-            <circle cx={cx} cy={cy} r={10} fill="#6366F1"/>
-          </svg>
-        </div>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex gap-3 mt-1 items-center flex-wrap justify-center">
-        <button
-          onClick={handleSpin}
-          disabled={spinning || landed}
-          className={`bid-btn relative px-8 py-3 rounded-xl font-display tracking-widest font-bold text-base transition-all hover:-translate-y-0.5 disabled:opacity-40 ${!spinning && !landed ? 'animate-glow-pulse' : ''}`}
-          style={{background: landed ? '#2E3A5C' : 'linear-gradient(135deg,#FBBF24,#F59E0B)', color: landed ? '#fff' : '#0A0F1D'}}>
-          {spinning ? '🌀 Spinning…' : landed ? '✅ Spun!' : '🎰 SPIN!'}
-        </button>
-        {landed && (
-          <button
-            onClick={() => landedPlayer && onSpin(landedPlayer._id)}
-            className="px-8 py-3 rounded-xl font-display tracking-widest text-white font-bold text-base transition-all hover:-translate-y-0.5"
-            style={{background:'linear-gradient(135deg,#059669,#38BDF8)'}}>
-            🏏 Load {landedPlayer ? landedPlayer.name : 'Player'}
-          </button>
-        )}
-        {landed && !spinning && (
-          <button
-            onClick={() => { setLanded(false); setLandedPlayer(null); }}
-            className="px-5 py-3 rounded-xl font-mono text-xs font-bold text-amber-300 hover:text-white bg-white/10 hover:bg-white/15 border border-amber-400/40 transition-all flex items-center gap-1.5"
-            title="Spin again to draw a different player">
-            🔄 Re-Spin
-          </button>
-        )}
-      </div>
-      {landed && landedPlayer && (
-        <p key={landedPlayer._id} className="relative text-sm font-bold mt-1 animate-pop" style={{color:'#34D399'}}>🎯 Landed on: {landedPlayer.name}</p>
-      )}
-      <p className="text-xs text-slate-400 font-raj">Spin the wheel, then load the player!</p>
+      <LuxurySpinWheel
+        players={players}
+        isHost={true}
+        size={390}
+        disabled={loading}
+        onSpinStart={(spinData) => {
+          if (roomId) {
+            try {
+              getSocket().emit('wheel-spin', {
+                roomId,
+                ...spinData,
+              });
+            } catch (err) {}
+          }
+        }}
+        onLoadPlayer={(winnerId) => {
+          onSpin(winnerId);
+        }}
+      />
     </div>
   );
 }
-
 
 /* ── "NEXT UP" reveal shown while the next player loads ─────────── */
 const NEXTUP_CSS = `
@@ -278,7 +138,9 @@ function NextUpOverlay({ player }) {
       <div className="absolute right-0 bottom-[16%] h-[2px] w-1/2 pointer-events-none"
         style={{ background:'linear-gradient(270deg,transparent,#F59E0B)', animation:'nuWipeR .6s .3s cubic-bezier(.22,1,.36,1) backwards' }}/>
 
-      <div className="relative text-6xl" style={{ transformOrigin:'bottom center', animation:'nuBat .8s ease-in-out infinite' }}>🏏</div>
+      <div className="w-16 h-16 rounded-2xl p-2.5 bg-black/70 border border-amber-400/50 shadow-xl shadow-amber-500/25 flex items-center justify-center animate-bounce">
+        <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
+      </div>
 
       <div className="relative font-display font-extrabold text-center"
         style={{ fontSize:'clamp(40px,8vw,84px)', lineHeight:1, animation:'nuTitle .40s cubic-bezier(.22,1,.36,1) backwards' }}>

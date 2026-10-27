@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
   socket.on('update-room-state', ({ roomId, data }) => { roomStates[roomId] = { ...roomStates[roomId], ...data }; socket.to(roomId).emit('room-state', roomStates[roomId]); });
   socket.on('player-result',  ({ roomId, result }) => { clearRoomTimer(roomId); io.to(roomId).emit('player-result', result); });
   socket.on('next-player',    ({ roomId, player }) => io.to(roomId).emit('next-player', player));
-  socket.on('wheel-spin',     ({ roomId, rotation, pickedPlayer }) => io.to(roomId).emit('wheel-spin', { rotation, pickedPlayer }));
+  socket.on('wheel-spin',     (data) => io.to(data?.roomId).emit('wheel-spin', data));
   socket.on('auction-paused', ({ roomId }) => { clearRoomTimer(roomId); io.to(roomId).emit('auction-paused'); });
   socket.on('auction-resumed',({ roomId }) => io.to(roomId).emit('auction-resumed'));
    // Admin dashboard made a live correction (price fix / sent player back to pool)

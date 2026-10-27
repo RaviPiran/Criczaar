@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAuction } from '../context/AuctionContext';
 import { getUserRooms, getFullRoom } from '../utils/api';
 import CricBg from '../components/CricBg';
+import criczaarLogo from '../logo.png';
 
 function toBase64(file) {
   return new Promise((res, rej) => {
@@ -96,8 +97,9 @@ export default function Tournaments() {
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-blue-700 flex items-center justify-center">
-              <span className="text-white font-display text-lg">C</span>
+            <div className="w-10 h-10 rounded-xl border border-white/20 p-1 flex items-center justify-center overflow-hidden"
+              style={{ background:'linear-gradient(135deg,rgba(245,158,11,0.25),rgba(10,15,29,0.9))' }}>
+              <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="font-display text-2xl text-white leading-none">CRIC<span className="text-amber-500">ZAAR</span></div>
