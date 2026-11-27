@@ -5,6 +5,7 @@ import { useAuction } from '../context/AuctionContext';
 import { getUserRooms, getFullRoom } from '../utils/api';
 import CricBg from '../components/CricBg';
 import ShareLiveLink from '../components/ShareLiveLink';
+import criczaarLogo from '../logo.png';
 
 const QuickCard = ({ icon, title, desc, action, onClick, accent='red' }) => {
   const styles = {
@@ -107,8 +108,12 @@ export default function Dashboard() {
           </div>
           <div className="relative flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              {tournament?.logo && (
+              {tournament?.logo ? (
                 <img src={tournament.logo} alt="" className="w-14 h-14 rounded-2xl object-cover border-2 border-white/20 flex-shrink-0"/>
+              ) : (
+                <div className="w-14 h-14 rounded-2xl p-1.5 bg-black/40 border border-white/20 flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain"/>
+                </div>
               )}
               <div>
                 {tournament?.name && (

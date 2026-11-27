@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import FullscreenButton from '../components/FullscreenButton';
+import criczaarLogo from '../logo.png';
 
 /* ── page-local styles & keyframes (prefixed ls-) ───────────────────── */
 const LS_CSS = `
@@ -335,8 +337,10 @@ export default function LiveSpectator() {
       <header className="sticky top-0 z-30 border-b backdrop-blur-xl" style={{ background:'rgba(10,15,29,0.82)', borderColor:'rgba(255,255,255,0.07)' }}>
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-display text-xl flex-shrink-0"
-              style={{ background:'linear-gradient(135deg,#FBBF24,#F59E0B)', color:'#0A0F1D', animation:'lsGlow 2.4s ease-in-out infinite' }}>C</div>
+            <div className="w-10 h-10 rounded-xl p-1 border border-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden"
+              style={{ background:'linear-gradient(135deg,rgba(245,158,11,0.25),rgba(10,15,29,0.9))', animation:'lsGlow 2.4s ease-in-out infinite' }}>
+              <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
+            </div>
             <div className="min-w-0">
               <div className="font-display text-xl leading-none">CRIC<span className="ls-gradtext">ZAAR</span></div>
               <div className="font-mono text-[9px] tracking-[0.25em] text-white/35 mt-1 truncate">{room?.name || 'LIVE AUCTION'}</div>
@@ -357,6 +361,7 @@ export default function LiveSpectator() {
               style={{ borderColor:'rgba(255,255,255,0.12)', color: copied ? '#34D399' : 'rgba(255,255,255,0.6)', background:'rgba(255,255,255,0.04)' }}>
               {copied ? '✓ Copied' : '🔗 Share'}
             </button>
+            <FullscreenButton size="sm" />
           </div>
         </div>
 
@@ -705,7 +710,8 @@ export default function LiveSpectator() {
           </div>
         )}
 
-        <footer className="text-center py-6 font-mono text-[10px] tracking-[0.25em] uppercase text-white/25">
+        <footer className="text-center py-6 font-mono text-[10px] tracking-[0.25em] uppercase text-white/30 flex items-center justify-center gap-1.5">
+          <img src={criczaarLogo} alt="" className="w-3.5 h-3.5 object-contain inline-block opacity-60" />
           Powered by <span className="ls-gradtext font-bold">CricZaar</span> · live auction platform
         </footer>
       </main>

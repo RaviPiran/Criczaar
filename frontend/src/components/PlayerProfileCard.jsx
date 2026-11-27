@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import criczaarLogo from '../logo.png';
 
 /* ── role themes (palette: amber / indigo / sky on ink) ───────────── */
 const ROLE_COLORS = {
@@ -31,6 +32,8 @@ const CSS = `
   -webkit-mask-composite:xor; mask-composite:exclude;
   animation:ppcSpin 7s linear infinite;
 }
+.ppc-wrap { width: 100% !important; max-width: 100% !important; display: block !important; }
+.ppc-card { width: 100% !important; }
 @media (prefers-reduced-motion: reduce){
   .ppc-card *, .ppc-card::before, .ppc-wrap { animation-duration:.01ms !important; animation-iteration-count:1 !important; }
 }
@@ -85,7 +88,7 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
   return (
     // key → whole card re-plays its entrance every time a new player is loaded
     <div key={player._id || player.id || player.name} className="ppc-wrap"
-      style={{ perspective: 1200, animation: 'ppcIn .7s cubic-bezier(.22,1,.36,1) backwards' }}>
+      style={{ perspective: 1200, animation: 'ppcIn .7s cubic-bezier(.22,1,.36,1) backwards', width: '100%' }}>
       <style>{CSS}</style>
 
       <div ref={cardRef} className="ppc-card" onMouseMove={onMove} onMouseLeave={onLeave}
@@ -137,15 +140,14 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
         <div style={{
           position:'absolute', top: lg ? 20 : 12, left: lg ? 20 : 12, zIndex:10,
           display:'flex', alignItems:'center', gap:7,
-          background:'rgba(10,15,29,0.65)', backdropFilter:'blur(8px)',
+          background:'rgba(10,15,29,0.75)', backdropFilter:'blur(8px)',
           border:`1px solid rgba(${c.glow},0.55)`, color:c.accent,
           padding: lg ? '5px 14px' : '3px 9px', borderRadius:999,
           fontFamily:"'JetBrains Mono', monospace", fontWeight:700,
           fontSize: lg ? 10 : 7, letterSpacing: 2, textTransform:'uppercase',
           animation:'ppcChip .5s .1s cubic-bezier(.22,1,.36,1) backwards',
         }}>
-          <span style={{ width: lg ? 7 : 5, height: lg ? 7 : 5, borderRadius:'50%', background:c.accent,
-            '--ppc-glow': c.glow, animation:'ppcPulse 1.6s ease-out infinite' }}/>
+          <img src={criczaarLogo} alt="CricZaar" style={{ width: lg ? 14 : 10, height: lg ? 14 : 10, objectFit:'contain' }} />
           Player Profile
         </div>
 
@@ -168,7 +170,7 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
             animation:'ppcPhoto .9s .15s cubic-bezier(.22,1,.36,1) backwards' }}>
             <img src={player.photo} alt={player.name}
               style={{
-                width:'100%', height:'100%', objectFit:'cover', display:'block',
+                width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', display:'block',
                 animation:'ppcFloat 6s 1s ease-in-out infinite',
                 WebkitMaskImage:'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.65) 28%, #000 58%), linear-gradient(to top, transparent 0%, #000 22%)',
                 WebkitMaskComposite:'source-in',
@@ -184,7 +186,14 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
             <img src={`${process.env.PUBLIC_URL || ''}/non-profile.png`} alt={player.name}
               draggable={false}
               style={{
-                width:'112%', maxWidth:'none', height:'auto', display:'block', marginBottom: lg ? -8 : -4,
+                width:'auto',
+                height:'92%',
+                maxWidth:'92%',
+                maxHeight:'92%',
+                objectFit:'contain',
+                objectPosition:'bottom center',
+                display:'block',
+                marginBottom: lg ? -4 : -2,
                 animation:'ppcFloat 6s 1s ease-in-out infinite',
                 filter:`drop-shadow(0 0 24px rgba(${c.glow},0.55))`,
               }}/>
@@ -197,7 +206,8 @@ export default function PlayerProfileCard({ player, size = 'large' }) {
             background:'rgba(10,15,29,0.7)', backdropFilter:'blur(8px)',
             border:`1px solid ${c.accent}55`, color:'#fff', borderRadius:8, padding:'5px 12px',
             fontFamily:"'JetBrains Mono', monospace", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase',
-            animation:'ppcFade .6s .8s cubic-bezier(.22,1,.36,1) backwards' }}>
+            animation:'ppcFade .6s .8s cubic-bezier(.22,1,.36,1) backwards', display:'inline-flex', alignItems:'center', gap:6 }}>
+            <img src={criczaarLogo} alt="" style={{ width:12, height:12, objectFit:'contain' }} />
             {player.role || 'Player'}{player.battingStyle ? ` • ${player.battingStyle}` : ''}
           </div>
         )}

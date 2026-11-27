@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import criczaarLogo from '../logo.png';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -195,9 +196,9 @@ export default function PlayerRegister() {
         {/* Header */}
         <div className="text-center space-y-2 pt-4">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#FBBF24,#F59E0B)' }}>
-              <span className="text-white font-display text-xl">C</span>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center p-1.5 border border-white/20 shadow-lg overflow-hidden flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg,rgba(245,158,11,0.25),rgba(10,15,29,0.9))' }}>
+              <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
             </div>
             <div className="text-left">
               <div className="font-display text-2xl text-white leading-none">
@@ -345,7 +346,8 @@ export default function PlayerRegister() {
           </p>
         </div>
 
-        <p className="text-center text-white/20 text-xs font-raj pb-6">
+        <p className="text-center text-white/30 text-xs font-raj pb-6 flex items-center justify-center gap-1.5">
+          <img src={criczaarLogo} alt="" className="w-4 h-4 object-contain inline-block opacity-60" />
           Powered by CricZaar Auction Platform
         </p>
       </div>

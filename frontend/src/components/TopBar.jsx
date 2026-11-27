@@ -1,6 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuction } from '../context/AuctionContext';
+import FullscreenButton from './FullscreenButton';
+import criczaarLogo from '../logo.png';
 
 const PAGE_TITLES = {
   '/dashboard':  { title:'Dashboard',    icon:'🏠', sub:'Overview of your auction' },
@@ -26,9 +28,9 @@ export default function TopBar({ onMenuClick }) {
       <button onClick={onMenuClick} className="lg:hidden text-slate-500 hover:text-amber-500 text-xl p-1 transition-colors">☰</button>
 
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg"
-          style={{background:'linear-gradient(135deg,#FBBF24,#F59E0B)'}}>
-          <span className="text-white text-sm">{meta.icon}</span>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center p-1 border border-white/10 shadow-sm flex-shrink-0"
+          style={{background:'linear-gradient(135deg,rgba(245,158,11,0.2),rgba(15,22,41,0.8))'}}>
+          <img src={criczaarLogo} alt="CricZaar" className="w-full h-full object-contain" />
         </div>
         <div>
           <h1 className="font-display text-lg leading-none tracking-wide text-ink-900">{meta.title}</h1>
@@ -36,7 +38,7 @@ export default function TopBar({ onMenuClick }) {
         </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2.5 sm:gap-3">
         {room && room.status !== 'setup' && (
           <div className="hidden sm:flex items-center gap-3 bg-ink-50 border border-ink-200 rounded-xl px-4 py-2 text-xs font-mono">
             <span className="text-slate-500">Sold <strong className="text-emerald-500 font-mono">{sold}</strong></span>
@@ -59,6 +61,21 @@ export default function TopBar({ onMenuClick }) {
             <span className="font-mono text-amber-500 text-sm font-bold">{room.code}</span>
           </div>
         )}
+
+        {room && (
+          <a
+            href={`/projector/${room.code}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Projector / Big Screen Stage Display"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/40 transition-all shadow-sm">
+            <span>📽️</span>
+            <span>Projector View</span>
+          </a>
+        )}
+
+        {/* Native Fullscreen Button (Hides Google tabs & address bar like YouTube) */}
+        <FullscreenButton showLabel={false} />
       </div>
     </header>
   );
